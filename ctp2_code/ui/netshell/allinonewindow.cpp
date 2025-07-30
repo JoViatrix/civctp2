@@ -3725,8 +3725,9 @@ void AllinoneWindow::SpitOutGameSetup( void )
 		{
 			{
 				ns_String goldInfo( "strings.goldinfo" );
-				sprintf(
+				snprintf(
 					temp,
+					sizeof(temp),
 					"%s%d",
 					goldInfo.GetString(),
 					r->GetValue() );
@@ -3741,8 +3742,9 @@ void AllinoneWindow::SpitOutGameSetup( void )
 		{
 			{
 				ns_String pwInfo( "strings.pwinfo" );
-				sprintf(
+				snprintf(
 					temp,
+					sizeof(temp),
 					"%s%d",
 					pwInfo.GetString(),
 					r->GetValue() );
@@ -3778,56 +3780,63 @@ void AllinoneWindow::SpitOutGameSetup( void )
 
 		ns_String mapsize( "strings.mapsize" );
 		aui_StringTable mapsizestrings( &errcode, "strings.mapsizestrings" );
-		sprintf(
+		snprintf(
 			temp,
+			sizeof(temp),
 			"%s: %s\n",
 			mapsize.GetString(),
 			mapsizestrings.GetString( g_gamesetup.GetMapSize() ) );
 		strncat( info, temp, biglen );
 
 		ns_String worldtype1( "strings.worldtype1" );
-		sprintf(
+		snprintf(
 			temp,
+			sizeof(temp),
 			"%s%d\n",
 			worldtype1.GetString(),
 			g_gamesetup.GetWorldType1() );
 		strncat( info, temp, biglen );
 
 		ns_String worldtype2( "strings.worldtype2" );
-		sprintf(
+		snprintf(
 			temp,
+			sizeof(temp),
 			"%s%d\n",
 			worldtype2.GetString(),
 			g_gamesetup.GetWorldType2() );
 		strncat( info, temp, biglen );
 
 		ns_String worldtype3( "strings.worldtype3" );
-		sprintf(
+		snprintf(
 			temp,
+			sizeof(temp),
 			"%s%d\n",
 			worldtype3.GetString(),
 			g_gamesetup.GetWorldType3() );
 		strncat( info, temp, biglen );
 
 		ns_String worldtype4( "strings.worldtype4" );
-		sprintf(
+		snprintf(
 			temp,
+			sizeof(temp),
 			"%s%d\n",
 			worldtype4.GetString(),
 			g_gamesetup.GetWorldType4() );
 		strncat( info, temp, biglen );
 
 		ns_String worldtype5( "strings.worldtype5" );
-		sprintf(
+		snprintf(
 			temp,
+			sizeof(temp),
 			"%s%d\n",
 			worldtype5.GetString(),
 			g_gamesetup.GetWorldType5() );
 		strncat( info, temp, biglen );
 
 		ns_String worldtype6( "strings.worldtype6" );
-		sprintf(
+		snprintf(
 			temp,
+			sizeof(temp),
 			"%s%d\n",
 			worldtype6.GetString(),
 			g_gamesetup.GetWorldType6() );
@@ -3835,8 +3844,9 @@ void AllinoneWindow::SpitOutGameSetup( void )
 
 		ns_String worldshape( "strings.worldshape" );
 		aui_StringTable worldshapestrings( &errcode, "strings.worldshapestrings" );
-		sprintf(
+		snprintf(
 			temp,
+			sizeof(temp),
 			"%s: %s\n",
 			worldshape.GetString(),
 			worldshapestrings.GetString( g_gamesetup.GetWorldShape() ) );
@@ -3844,8 +3854,9 @@ void AllinoneWindow::SpitOutGameSetup( void )
 
 		ns_String difficulty1( "strings.difficulty1" );
 		aui_StringTable difficulty1strings( &errcode, "strings.difficulty1strings" );
-		sprintf(
+		snprintf(
 			temp,
+			sizeof(temp),
 			"%s: %s\n",
 			difficulty1.GetString(),
 			difficulty1strings.GetString( g_gamesetup.GetDifficulty1() ) );
@@ -3853,16 +3864,18 @@ void AllinoneWindow::SpitOutGameSetup( void )
 
 		ns_String difficulty2( "strings.difficulty2" );
 		aui_StringTable difficulty2strings( &errcode, "strings.difficulty2strings" );
-		sprintf(
+		snprintf(
 			temp,
+			sizeof(temp),
 			"%s: %s\n",
 			difficulty2.GetString(),
 			difficulty2strings.GetString( g_gamesetup.GetDifficulty2() ) );
 		strncat( info, temp, biglen );
 
 		ns_String startage( "strings.startage" );
-		sprintf(
+		snprintf(
 			temp,
+			sizeof(temp),
 			"%s %s\n",
 			startage.GetString(),
 			g_theAgeDB->Get(g_gamesetup.GetStartAge())->GetNameText());
@@ -3870,8 +3883,9 @@ void AllinoneWindow::SpitOutGameSetup( void )
 
 		ns_String endage( "strings.endage" );
 
-		sprintf(
+		snprintf(
 			temp,
+			sizeof(temp),
 			"%s %s\n",
 			endage.GetString(),
 			g_theAgeDB->Get(g_gamesetup.GetEndAge())->GetNameText());

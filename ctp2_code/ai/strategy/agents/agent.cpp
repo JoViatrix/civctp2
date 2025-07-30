@@ -710,7 +710,7 @@ void Agent::Ungroup_Order()
 	Set_Can_Be_Executed(false);
 
 	MBCHAR * myString = new MBCHAR[256];
-	sprintf(myString, "Ungrouping at (%d,%d)", pos.x, pos.y);
+	snprintf(myString, sizeof(myString), "Ungrouping at (%d,%d)", pos.x, pos.y);
 	g_graphicsOptions->AddTextToArmy(m_army, myString, 220, Get_Goal_Type());
 	delete[] myString;
 }

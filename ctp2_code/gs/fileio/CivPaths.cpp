@@ -212,7 +212,7 @@ CivPaths::CivPaths(AUI_ERRCODE &errcode)
 	MBCHAR	fullPath[_MAX_PATH];
 	MBCHAR	*s;
 
-	sprintf(tempPath, "%s%s%s", m_hdPath, FILE_SEP, m_savePath);
+	snprintf(tempPath, sizeof(tempPath), "%s%s%s", m_hdPath, FILE_SEP, m_savePath);
 	s = _fullpath(fullPath, tempPath, _MAX_PATH);
 	Assert(s != NULL);
 
@@ -256,17 +256,17 @@ void CivPaths::CreateSaveFolders(const MBCHAR *path)
 
 	c3files_CreateDirectory(path);
 
-	sprintf(subFolderPath, "%s%s%s", path, FILE_SEP, m_saveGamePath);
+	snprintf(subFolderPath, sizeof(subFolderPath), "%s%s%s", path, FILE_SEP, m_saveGamePath);
 	c3files_CreateDirectory(subFolderPath);
-	sprintf(subFolderPath, "%s%s%s", path, FILE_SEP, m_saveQueuePath);
+	snprintf(subFolderPath, sizeof(subFolderPath), "%s%s%s", path, FILE_SEP, m_saveQueuePath);
 	c3files_CreateDirectory(subFolderPath);
-	sprintf(subFolderPath, "%s%s%s", path, FILE_SEP, m_saveMPPath);
+	snprintf(subFolderPath, sizeof(subFolderPath), "%s%s%s", path, FILE_SEP, m_saveMPPath);
 	c3files_CreateDirectory(subFolderPath);
-	sprintf(subFolderPath, "%s%s%s", path, FILE_SEP, m_saveSCENPath);
+	snprintf(subFolderPath, sizeof(subFolderPath), "%s%s%s", path, FILE_SEP, m_saveSCENPath);
 	c3files_CreateDirectory(subFolderPath);
-	sprintf(subFolderPath, "%s%s%s", path, FILE_SEP, m_saveMapPath);
+	snprintf(subFolderPath, sizeof(subFolderPath), "%s%s%s", path, FILE_SEP, m_saveMapPath);
 	c3files_CreateDirectory(subFolderPath);
-	sprintf(subFolderPath, "%s%s%s", path, FILE_SEP, m_saveClipsPath);
+	snprintf(subFolderPath, sizeof(subFolderPath), "%s%s%s", path, FILE_SEP, m_saveClipsPath);
 	c3files_CreateDirectory(subFolderPath);
 }
 
