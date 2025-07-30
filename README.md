@@ -1,6 +1,10 @@
-[![Build Status](https://travis-ci.com/civctp2/civctp2.svg?branch=master)](https://travis-ci.com/civctp2/civctp2)
-
 ## Apolyton Call to Power II Source Code Project
+
+This is a modest attempt at modernizing the source code so that it can be built and run on modern Linux OSes without fault and too many warnings.
+
+## State of the attempt
+
+Currently, the code compiles and runs on Fedora 42 on my machine.
 
 #### CivCTP2
 - Git SVN import of http://ctp2.darkdust.net/anonsvn/
