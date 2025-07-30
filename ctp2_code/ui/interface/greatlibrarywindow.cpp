@@ -338,12 +338,12 @@ sint32 GreatLibraryWindow::SetTechMode ( sint32 theMode, DATABASE theDatabase )
 
 	if (iconRec)
     {
-		sprintf( m_still_file, iconRec->GetFirstFrame());
-		sprintf( m_movie_file, iconRec->GetMovie());
-		sprintf( m_gameplay_file, iconRec->GetGameplay());
-		sprintf( m_history_file, iconRec->GetHistorical());
-		sprintf( m_requirement_file, iconRec->GetPrereq());
-		sprintf( m_variable_file, iconRec->GetVari());
+		snprintf(m_still_file, sizeof(m_still_file), "%s", iconRec->GetFirstFrame());
+		snprintf(m_movie_file, sizeof(m_movie_file), "%s", iconRec->GetMovie());
+		snprintf(m_gameplay_file, sizeof(m_gameplay_file), "%s", iconRec->GetGameplay());
+		snprintf(m_history_file, sizeof(m_history_file), "%s", iconRec->GetHistorical());
+		snprintf(m_requirement_file, sizeof(m_requirement_file), "%s", iconRec->GetPrereq());
+		snprintf(m_variable_file, sizeof(m_variable_file), "%s", iconRec->GetVari());
 	}
 
 	return TRUE;

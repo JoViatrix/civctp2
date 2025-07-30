@@ -29,7 +29,6 @@ AM_CFLAGS = \
 	"-D__NO_ANONYMOUS_UNIONS__" \
 	"-DPACK=$(PACK)" \
 	-Dstrnicmp=strncasecmp \
-	-Wno-format \
 	-Dstricmp=strcasecmp \
 	-Ddp_ANET2
 

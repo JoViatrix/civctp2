@@ -279,7 +279,7 @@ void CivPaths::InitCDPath(void)
 	if(ctpcd < 0)
 		return;
 
-	sprintf(tempPath, "%c:%s%s", ctpcd, FILE_SEP, m_cdPath);
+	snprintf(tempPath, sizeof(tempPath), "%c:%s%s", ctpcd, FILE_SEP, m_cdPath);
 	strcpy(m_cdPath, tempPath);
 }
 #endif // USE_SDL

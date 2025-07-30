@@ -1251,6 +1251,13 @@ bool CivApp::InitializeAppDB(void)
 
 sint32 CivApp::InitializeApp(HINSTANCE hInstance, int iCmdShow)
 {
+	AUI_ERRCODE civPathsErr;
+	g_civPaths = new CivPaths(civPathsErr);
+
+	if (civPathsErr != AUI_ERRCODE_OK) {
+		fprintf(stderr, "Failed to initialize g_civPaths\n");
+		return -1;
+	}
 #if defined(__AUI_USE_DIRECTX__)
 	// COM needed for DirectX/Movies
 	CoInitialize(NULL);

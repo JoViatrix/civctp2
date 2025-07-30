@@ -479,6 +479,12 @@ dp_species_t cur_species = 55;
 #define CHAT_PACKET_ID		dppt_MAKE('C','H')
 #define SPAM_PACKET_ID		dppt_MAKE('S','P')
 
+DP_API dp_result_t dpEnumApp(dp_t* dp, dpEnumAppCallback_t cb, void *context)
+{
+	/* Not implemented */
+	return dp_RES_BUG;
+}
+
 static void quit(int exit_code)
 {
 	if (myDP) {

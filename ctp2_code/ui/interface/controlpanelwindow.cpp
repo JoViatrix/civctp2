@@ -3465,7 +3465,7 @@ void cpw_NumberToCommas( uint64 number, MBCHAR *s )
 	temp -= (uint64)thousand * k_CPW_THOUSAND;
 
 	MBCHAR c[_MAX_PATH];
-	sprintf( c, g_theStringDB->GetNameStr("str_ldl_comma") );
+	snprintf(c, _MAX_PATH, "%s", g_theStringDB->GetNameStr("str_ldl_comma"));
 
 	if ( trillion )
 	{

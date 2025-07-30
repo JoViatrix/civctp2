@@ -88,14 +88,3 @@ DP_API dp_result_t dpDownloadUpdate(dp_t *dp, const dp_appParam_t *app)
 }
 
 #endif
-
-/*----------------------------------------------------------------------
- Enumerate applications installed on this machine.
- Callback is called once for each application found.
- Callback ends when dpEnumApp() exits.
-----------------------------------------------------------------------*/
-DP_API dp_result_t dpEnumApp(dp_t* dp, dpEnumAppCallback_t cb, void *context)
-{
-	/* Not implemented */
-	return dp_RES_BUG;
-}

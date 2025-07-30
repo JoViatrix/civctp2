@@ -687,7 +687,7 @@ void Agent::Group_With( Agent_ptr second_army )
 
 	MapPoint dest_pos = m_goal->Get_Target_Pos();
 
-	sprintf(myString, "Grouping at (%d,%d) to %s (%d,%d)", pos.x, pos.y, goalString, dest_pos.x, dest_pos.y);
+	snprintf(myString, sizeof(myString), "Grouping at (%d,%d) to %s (%d,%d)", pos.x, pos.y, goalString, dest_pos.x, dest_pos.y);
 	g_graphicsOptions->AddTextToArmy(m_army, myString, 220, m_goal->Get_Goal_Type());
 
 	delete[] goalString;
