@@ -1,3 +1,7 @@
+.vscode
+ctp2_code/mapgen/FaultGen_geometric.cpp
+ctp2_data/french/gamedata/info_str.txt
+
 *.o
 *.orig
 *.rej
