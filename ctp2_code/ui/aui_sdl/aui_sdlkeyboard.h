@@ -16,7 +16,7 @@
 
 // See aui_sdlkeyboard.cpp to understand this queue/mutex
 extern std::queue<SDL_Event> g_secondaryKeyboardEventQueue;
-extern SDL_mutex* g_secondaryKeyboardEventQueueMutex;
+extern SDL_Mutex* g_secondaryKeyboardEventQueueMutex;
 
 class aui_SDLKeyboard : public aui_Keyboard, public aui_SDLInput {
 public:
@@ -28,7 +28,7 @@ protected:
 	AUI_ERRCODE createSDLKeyboard();
 	void convertSDLKeyboardEvent(SDL_KeyboardEvent &sdlevent,
 	                             aui_KeyboardEvent &auievent);
-	uint32 convertSDLKey(SDL_Keysym keysym);
+	uint32 convertSDLKey(SDL_KeyboardEvent keysym);
 
 public:
 	virtual AUI_ERRCODE Acquire();

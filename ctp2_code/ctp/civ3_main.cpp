@@ -171,8 +171,8 @@
 #include <unistd.h>
 #endif
 #if defined(USE_SDL)
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_mixer.h>
+#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 #if defined(__AUI_USE_SDL__)
 #include "aui_sdlkeyboard.h"
 #endif
@@ -1651,7 +1651,7 @@ int WINAPI CivMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 			}
 
 			// If you want to handle more events then update FilterEvents in aui_sdl.cpp
-			int n = SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_MOUSEMOTION-1);
+			int n = SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_EVENT_FIRST, SDL_EVENT_MOUSE_MOTION-1);
 
 			if(0 > n)
 			{
@@ -1661,7 +1661,7 @@ int WINAPI CivMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 			if(0 == n)
 			{
-				n = SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_MOUSEWHEEL+1, SDL_LASTEVENT);
+				n = SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_EVENT_MOUSE_WHEEL+1, SDL_EVENT_LAST);
 
 				if(0 > n)
 				{
@@ -1676,26 +1676,18 @@ int WINAPI CivMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 					break;
 				}
 			}
-			if(SDL_QUIT == event.type) {
+			if(SDL_EVENT_QUIT == event.type) {
 				gDone = TRUE;
 			}
 
 			// If a keyboard event then we must reenqueue it so that aui_sdlkeyboard has a chance to look at it
-			if(event.type == SDL_KEYDOWN || event.type == SDL_KEYUP)
+			if(event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP)
 			{
-				if(-1==SDL_LockMutex(g_secondaryKeyboardEventQueueMutex))
-				{
-					fprintf(stderr, "[CivMain] SDL_LockMutex failed: %s\n", SDL_GetError());
-					break;
-				}
+				SDL_LockMutex(g_secondaryKeyboardEventQueueMutex);
 
 				g_secondaryKeyboardEventQueue.push(event);
 
-				if(-1==SDL_UnlockMutex(g_secondaryKeyboardEventQueueMutex))
-				{
-					fprintf(stderr, "[CivMain] SDL_UnlockMutex failed: %s\n", SDL_GetError());
-					break;
-				}
+				SDL_UnlockMutex(g_secondaryKeyboardEventQueueMutex);
 			}
 
 #elif defined(__AUI_USE_DIRECTX__)
@@ -1774,13 +1766,13 @@ int SDLMessageHandler(void* userdata, SDL_Event* event)
 
 	switch(event->type)
 	{
-	case SDL_KEYDOWN:
+	case SDL_EVENT_KEY_DOWN:
 		{
 			// TODO: Determine what the 'swallowNextChar' variable
 			// is for, and, if necessary, implement appropriate
 			// code in the SDL sections to perform the same function.
-			SDL_Keycode key = event->key.keysym.sym;
-			Uint16 mod = event->key.keysym.mod;
+			SDL_Keycode key = event->key.key;
+			Uint16 mod = event->key.mod;
 			WPARAM wp = '\0';
 			switch (key) {
 #define SDLKCONV(sdl_name, char) \
@@ -1789,20 +1781,20 @@ int SDLMessageHandler(void* userdata, SDL_Event* event)
 				break;
 #define SDLKCONVSHIFT(sdl_name, charWoShift, charWShift) \
 			case (sdl_name): \
-				wp = ( (mod & KMOD_SHIFT) ? (charWShift) : (charWoShift) ); \
+				wp = ( (mod & SDL_KMOD_CTRL) ? (charWShift) : (charWoShift) ); \
 				break;
 				// For the purposes of this macro, shift is ignored when ctrl is pressed
 #define SDLKCONVSHIFTCTRL(sdl_name, charWoShift, charWShift, charWCtrl) \
 			case (sdl_name): \
-				wp = ( (mod & KMOD_CTRL) ? (charWCtrl) : '\0' \
+				wp = ( (mod & SDL_KMOD_CTRL) ? (charWCtrl) : '\0' \
 					); \
 				break;
 #define SDLKCONVSHIFTANDCTRL(sdl_name, charWoShift, charWShift, charWCtrl, charWCtrlAndShift) \
 			case (sdl_name): \
 				wp = ( \
-						(mod & KMOD_SHIFT) ? \
-							(mod & KMOD_CTRL) ? (charWCtrlAndShift) : (charWShift) : \
-							(mod & KMOD_CTRL) ? (charWCtrl) : (charWoShift) \
+						(mod & SDL_KMOD_SHIFT) ? \
+							(mod & SDL_KMOD_CTRL) ? (charWCtrlAndShift) : (charWShift) : \
+							(mod & SDL_KMOD_CTRL) ? (charWCtrl) : (charWoShift) \
 					); \
 				break;
 			SDLKCONV(SDLK_BACKSPACE, VK_BACK); // set to VK_BACK to hit escape rules in aui_textfield.cpp
@@ -1835,32 +1827,32 @@ int SDLMessageHandler(void* userdata, SDL_Event* event)
 			SDLKCONVSHIFT(SDLK_F13, '#' + 128, '\0');
 			SDLKCONVSHIFT(SDLK_F14, '$' + 128, '\0');
 			SDLKCONVSHIFT(SDLK_F15, '%' + 128, '\0');
-			SDLKCONVSHIFTCTRL(SDLK_a, 'a', 'A', 'a' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_b, 'b', 'B', 'b' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_c, 'c', 'C', 'c' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_d, 'd', 'D', 'd' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_e, 'e', 'E', 'e' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_f, 'f', 'F', 'f' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_g, 'g', 'G', 'g' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_h, 'h', 'H', 'h' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_i, 'i', 'I', 'i' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_j, 'j', 'J', 'j' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_k, 'k', 'K', 'k' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_l, 'l', 'L', 'l' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_m, 'm', 'M', 'm' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_n, 'n', 'N', 'n' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_o, 'o', 'O', 'o' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_p, 'p', 'P', 'p' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_q, 'q', 'Q', 'q' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_r, 'r', 'R', 'r' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_s, 's', 'S', 's' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_t, 't', 'T', 't' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_u, 'u', 'U', 'u' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_v, 'v', 'V', 'v' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_w, 'w', 'W', 'w' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_x, 'x', 'X', 'x' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_y, 'y', 'Y', 'y' - 'a' + 1);
-			SDLKCONVSHIFTCTRL(SDLK_z, 'z', 'Z', 'z' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_A, 'a', 'A', 'a' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_B, 'b', 'B', 'b' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_C, 'c', 'C', 'c' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_D, 'd', 'D', 'd' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_E, 'e', 'E', 'e' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_F, 'f', 'F', 'f' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_G, 'g', 'G', 'g' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_H, 'h', 'H', 'h' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_I, 'i', 'I', 'i' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_J, 'j', 'J', 'j' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_K, 'k', 'K', 'k' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_L, 'l', 'L', 'l' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_M, 'm', 'M', 'm' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_N, 'n', 'N', 'n' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_O, 'o', 'O', 'o' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_P, 'p', 'P', 'p' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_Q, 'q', 'Q', 'q' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_R, 'r', 'R', 'r' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_S, 's', 'S', 's' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_T, 't', 'T', 't' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_U, 'u', 'U', 'u' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_V, 'v', 'V', 'v' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_W, 'w', 'W', 'w' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_X, 'x', 'X', 'x' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_Y, 'y', 'Y', 'y' - 'a' + 1);
+			SDLKCONVSHIFTCTRL(SDLK_Z, 'z', 'Z', 'z' - 'a' + 1);
 #undef SDLKCONV
 #undef SDLKCONVSHIFT
 #undef SDLKCONVSHIFTCTRL
@@ -1872,29 +1864,25 @@ int SDLMessageHandler(void* userdata, SDL_Event* event)
 			}
 			break;
 		} // end of case SDL_KEYDOWN
-	case SDL_WINDOWEVENT:
 
-		switch (event->window.event)
-		{
-		case SDL_WINDOWEVENT_RESIZED:
-			break;
-		case SDL_WINDOWEVENT_SIZE_CHANGED:
-		{
-			g_c3ui->ChangeSize(event->window.data1, event->window.data2);
-			break;
-		}
-		case SDL_WINDOWEVENT_MAXIMIZED:
-			break;
-		case SDL_WINDOWEVENT_RESTORED:
-			break;
-		case SDL_WINDOWEVENT_MOVED:
-			break;
-		default:
-			break;
-		}
+	// case SDL_WINDOWEVENT_
 
+	case SDL_EVENT_WINDOW_RESIZED:
 		break;
-	case SDL_TEXTINPUT:
+	case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+	{
+		g_c3ui->ChangeSize(event->window.data1, event->window.data2);
+		break;
+	}
+	case SDL_EVENT_WINDOW_MAXIMIZED:
+	case SDL_EVENT_WINDOW_RESTORED:
+	case SDL_EVENT_WINDOW_MOVED:
+	default:
+		break;
+
+	// case SDL_WINDOWEVENT_
+
+	case SDL_EVENT_TEXT_INPUT:
 	{
 		std::string source(event->text.text);
 		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
@@ -1904,7 +1892,7 @@ int SDLMessageHandler(void* userdata, SDL_Event* event)
 
 		break;
 	}
-	case SDL_MOUSEWHEEL:
+	case SDL_EVENT_MOUSE_WHEEL:
 	{
 		if (event->wheel.y > 0)
 		{
@@ -1916,7 +1904,7 @@ int SDLMessageHandler(void* userdata, SDL_Event* event)
 		}
 		break;
 	}
-	case SDL_QUIT:
+	case SDL_EVENT_QUIT:
 		gDone = TRUE;
 
 		DoFinalCleanup();
@@ -2076,8 +2064,8 @@ BOOL ExitGame(void)
 {
 #if defined(__AUI_USE_SDL__)
 	static SDL_Event quit = { 0 };
-	quit.type = SDL_QUIT;
-	quit.quit.type = SDL_QUIT;
+	quit.type = SDL_EVENT_QUIT;
+	quit.quit.type = SDL_EVENT_QUIT;
 	int e = SDL_PushEvent(&quit);
 	return (e != 0);
 #elif defined(__AUI_USE_DIRECTX__)

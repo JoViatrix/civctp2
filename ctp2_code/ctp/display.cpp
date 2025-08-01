@@ -9,7 +9,7 @@
 #if defined(__AUI_USE_DIRECTX__)
 #include <multimon.h>
 #elif defined(__AUI_USE_SDL__)
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 #endif
 
 PointerList<CTPDisplayMode>	*g_displayModes = NULL;
@@ -122,60 +122,30 @@ HRESULT CALLBACK display_DisplayModeCallback(LPDDSURFACEDESC pdds, LPVOID lParam
 
 void display_EnumerateDisplayModes(void)
 {
-#ifdef __AUI_USE_DIRECTX__
-	HRESULT				hr;
-	LPDIRECTDRAW		dd;
-
-	hr = DirectDrawCreate(g_displayDevice.lpGUID, &dd, NULL);
-	Assert(hr == DD_OK);
-	if (hr != DD_OK) {
-		c3errors_FatalDialog(appstrings_GetString(APPSTR_DIRECTX),
-								appstrings_GetString(APPSTR_REINSTALLDIRECTX));
-		return;
-	}
-
-	g_displayModes = new PointerList<CTPDisplayMode>;
-#else
 	g_displayModes = new PointerList<CTPDisplayMode>;
 
-	static const int PRIMARY_DISPLAY = 0;
-	int numberOfDisplayModes = SDL_GetNumDisplayModes(PRIMARY_DISPLAY);
-	if (numberOfDisplayModes < 1) {
+	SDL_DisplayID PRIMARY_DISPLAY = SDL_GetPrimaryDisplay(); //should be changed to sth that can be chosen by user
+	int numberOfDisplayModes = 0;
+	SDL_DisplayMode **displayModes = SDL_GetFullscreenDisplayModes(PRIMARY_DISPLAY, &numberOfDisplayModes);
+	//int numberOfDisplayModes = SDL_GetNumDisplayModes(PRIMARY_DISPLAY);
+	if (displayModes == NULL || numberOfDisplayModes == 0) {
         c3errors_FatalDialog("CivApp", "Unable to find display-modes:\n%s\n", SDL_GetError());
         return;
     }
 
-	SDL_DisplayMode displayMode;
 	for (int i = 0; i < numberOfDisplayModes; i++) {
-        const int rc = SDL_GetDisplayMode(PRIMARY_DISPLAY, i, &displayMode);
-        if (rc < 0) {
-            c3errors_FatalDialog("CivApp", "Unable to get display-mode:\n%s\n", SDL_GetError());
-            return;
-        }
-        if (!display_IsLegalResolution(displayMode.w, displayMode.h) && (displayMode.h >= 600)) {
+        if (!display_IsLegalResolution(displayModes[i]->w, displayModes[i]->h) && (displayModes[i]->h >= 600)) {
             CTPDisplayMode *mode = new CTPDisplayMode;
             if (!mode) {
                 return;
             }
-            mode->width = displayMode.w;
-            mode->height = displayMode.h;
+            mode->width = displayModes[i]->w;
+            mode->height = displayModes[i]->h;
             g_displayModes->AddTail(mode);
         }
     }
-#endif
 
-#ifdef __AUI_USE_DIRECTX__
-	hr = dd->EnumDisplayModes(0, NULL, NULL, display_DisplayModeCallback);
-
-	if (g_displayModes->GetCount() < 1) {
-		c3errors_FatalDialog(appstrings_GetString(APPSTR_DIRECTX),
-							appstrings_GetString(APPSTR_NO16BIT));
-
-		return;
-	}
-
-	dd->Release();
-#endif
+	SDL_free(displayModes);
 }
 
 

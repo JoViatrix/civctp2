@@ -53,7 +53,7 @@ public:
 
 	static uint32 m_SDLSurfaceClassId;
 
-	SDL_mutex* m_bltMutex;
+	SDL_Mutex* m_bltMutex;
 
 	SDL_Surface* GetSDLSurface() { return m_lpdds; }
 protected:

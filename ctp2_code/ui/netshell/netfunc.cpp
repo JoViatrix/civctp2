@@ -47,8 +47,8 @@
 #endif
 
 #ifdef __AUI_USE_SDL__
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_thread.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_thread.h>
 #endif
 
 #if defined(WIN32)

@@ -48,10 +48,10 @@
 #undef STREAM_TYPE
 #endif
 
-#if defined(USE_SDL)
-#include <SDL2/SDL_mixer.h>
-#else
-#include "mss.h"
+#include <SDL3_mixer/SDL_mixer.h>
+
+#ifndef MIX_MAX_VOLUME
+#define MIX_MAX_VOLUME 1.0f
 #endif
 
 class CivSound {
@@ -60,13 +60,11 @@ public:
 	~CivSound();
 
 	const uint32 GetAssociatedObject() const;
-#if !defined(USE_SDL)
-	HAUDIO       GetHAudio() const;
-#else
-	Mix_Chunk    *GetAudio() const;
+	MIX_Audio    *GetAudio() const;
     void         SetChannel(const int &channel);
     const int    GetChannel() const;
-#endif
+	void		 SetTrack(MIX_Track *track);
+	MIX_Track    *GetTrack() const;
 	MBCHAR       *GetSoundFilename();
 	const BOOL   IsPlaying() const;
 	void         SetIsPlaying(const BOOL &is);
@@ -77,12 +75,9 @@ public:
 	void         SetVolume(const sint32 &volume);
 
 private:
-#if !defined(USE_SDL)
-	HAUDIO			m_hAudio;
-#else
-	Mix_Chunk      *m_Audio;
+	MIX_Audio      *m_Audio;
+	MIX_Track      *m_soundTrack;
     int             m_Channel;
-#endif
 	uint32 			m_associatedObject;
 	MBCHAR			m_soundFilename[_MAX_PATH];
 	BOOL			m_isPlaying;
@@ -93,4 +88,4 @@ private:
     size_t          m_datasize;
 };
 
-#endif
+#endif // __CIVSOUND_H__

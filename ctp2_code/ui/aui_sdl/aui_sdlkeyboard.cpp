@@ -3,7 +3,7 @@
 
 #if defined(__AUI_USE_SDL__)
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 #include "aui_sdlkeyboard.h"
 #include "c3ui.h"
 
@@ -22,7 +22,7 @@ std::queue<SDL_Event> g_secondaryKeyboardEventQueue;
 // better, but I'll leave it in here to be on the safe side).
 // This is created in civ3_main.cpp just before the main loop, and
 // destroyed in AtExitProc() (also in civ3_main.cpp).
-SDL_mutex* g_secondaryKeyboardEventQueueMutex = NULL;
+SDL_Mutex* g_secondaryKeyboardEventQueueMutex = NULL;
 
 aui_SDLKeyboard::aui_SDLKeyboard(
 	AUI_ERRCODE *retval )
@@ -149,11 +149,11 @@ AUI_ERRCODE aui_SDLKeyboard::GetInput( void )
 				case SDLK_RIGHT:
 					if (event.key.state & SDL_PRESSED)
 					{
-						g_civApp->BeginKeyboardScrolling(convertSDLKey(event.key.keysym));
+						g_civApp->BeginKeyboardScrolling(convertSDLKey(event.key));
 					}
 					else
 					{
-						g_civApp->StopKeyboardScrolling(convertSDLKey(event.key.keysym));
+						g_civApp->StopKeyboardScrolling(convertSDLKey(event.key));
 					}
 					break;
 			}
@@ -170,14 +170,14 @@ void aui_SDLKeyboard::convertSDLKeyboardEvent(SDL_KeyboardEvent &sdlevent,
                                       aui_KeyboardEvent &auievent)
 {
 	auievent.down = (sdlevent.state & SDL_PRESSED) ? TRUE : FALSE;
-	auievent.key = convertSDLKey(sdlevent.keysym);
+	auievent.key = convertSDLKey(sdlevent);
 	/*printf("convertSDLKeyboardEvent(): %08x %d %08x %c\n", auievent.key,
 		(sdlevent.state & SDL_PRESSED) ? TRUE : FALSE, sdlevent.keysym.sym, (sdlevent.keysym.sym>' ' && sdlevent.keysym.sym<127)?sdlevent.keysym.sym:' ');*/
 }
 
-uint32 aui_SDLKeyboard::convertSDLKey(SDL_Keysym keysym)
+uint32 aui_SDLKeyboard::convertSDLKey(SDL_KeyboardEvent keyboardevent)
 {
-	switch (keysym.sym) {
+	switch (keyboardevent.key) {
 		case SDLK_ESCAPE:
 			return AUI_KEYBOARD_KEY_ESCAPE;
 		case SDLK_RETURN:

@@ -43,10 +43,8 @@
 #include "pointerlist.h"
 #include "gamesounds.h"
 
-#if defined(USE_SDL)
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_mixer.h>
-#endif
+#include <SDL3/SDL.h>
+#include <SDL3_mixer/SDL_mixer.h>
 
 template <class T> class PointerList;
 
@@ -56,8 +54,6 @@ enum SOUNDTYPE {
 	SOUNDTYPE_SFX,
 	SOUNDTYPE_VOICE,
 	SOUNDTYPE_MUSIC,
-
-	SOUNDTYPE_MAX
 };
 
 enum MUSICSTYLE {
@@ -84,7 +80,9 @@ public:
 	void InitSoundDriver();
 	void CleanupSoundDriver();
 
+	[[deprecated("InitRedbook is deprecated and doesn't do anything. It will be removed in the future")]]
 	void InitRedbook();
+
 	void CleanupRedbook();
 
 	void DumpAllSounds();
@@ -136,44 +134,33 @@ public:
 	const sint32     GetLastTrack() const;
 	void             SetLastTrack(const sint32 &track);
 
-	void StupidPlaySound(const sint32 &soundID);
+	[[deprecated("PlayManagedSound is deprecated and doesn't do anything. It will be removed in the future.")]]
 	void PlayManagedSound(const MBCHAR *fullFilename, const bool &bNoWait);
+
+	[[deprecated("ReleaseSoundDriver is deprecated and will be removed in the future.")]]
 	void ReleaseSoundDriver();
-	void ReacquireSoundDriver();
 
 private:
 	PointerList<CivSound>	*m_sfxSounds;
 	PointerList<CivSound>	*m_voiceSounds;
-
 	PointerList<CivSound>::Walker *m_soundWalker;
-
 	uint32					m_sfxVolume;
 	uint32					m_musicVolume;
 	uint32					m_voiceVolume;
-
-	uint32					m_oldRedbookVolume;
-
 	BOOL					m_noSound;
-	BOOL					m_usePlaySound;
-
-#if defined(USE_SDL)
-	BOOL					m_useOggTracks;
-	Mix_Music				*m_oggTrack;
-#else // USE_SDL
-	HREDBOOK				m_redbook;
-#endif // USE_SDL
+	MIX_Audio				*m_oggTrack;
+	MIX_Track 				*m_musicTrack;
+	MIX_Mixer				*m_mixer;
 	uint32					m_timeToCheckMusic;
 	sint32					m_numTracks;
 	sint32					m_curTrack;
 	sint32					m_lastTrack;
 	BOOL					m_musicEnabled;
-
 	MUSICSTYLE				m_style;
 	sint32					m_playListPosition;
 	sint32					m_userTrack;
-	BOOL					m_autoRepeat;
-
-	BOOL					m_stopRedbookTemporarily;
+	BOOL					m_autoRepeat; // For MUSICSTYLE_USER
+	BOOL					m_musicAutoRestartDisabled; // m_stopRedbookTemporarily
 };
 
 extern SoundManager *g_soundManager;

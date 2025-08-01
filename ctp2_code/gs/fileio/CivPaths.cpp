@@ -39,7 +39,7 @@
 #include "LanguageRecord.h"
 #include <clocale>
 #if defined(__AUI_USE_SDL__)
-#include "SDL_locale.h"
+#include <SDL3/SDL_locale.h> // #include "SDL_locale.h"
 #endif
 
 #ifdef WIN32
@@ -903,13 +903,15 @@ void CivPaths::SetLocaleFromLanguage()
 const LanguageRecord* CivPaths::FindLanguage()
 {
 #if defined(__AUI_USE_SDL__)
-	SDL_Locale* locales = SDL_GetPreferredLocales();
+	SDL_Locale** locales = SDL_GetPreferredLocales(NULL);
 
 	if(locales != NULL)
 	{
 		// Get the language that matches the IsoCode
-		for(size_t j = 0; locales[j].language != NULL; j++)
+		for(size_t j = 0; locales[j] != NULL; j++)
 		{
+			SDL_Locale *loc = locales[j];
+
 			for(sint32 i = 0; i < g_theLanguageDB->NumRecords(); i++)
 			{
 				const LanguageRecord* lanRec = g_theLanguageDB->Get(i);
@@ -920,7 +922,7 @@ const LanguageRecord* CivPaths::FindLanguage()
 				if(lanRec->GetHidden())
 					continue;
 
-				if(strcmp(lanRec->GetIsoCode(), locales[j].language) == 0)
+				if(strcmp(lanRec->GetIsoCode(), loc->language) == 0)
 				{
 					SDL_free(locales);
 					return lanRec;

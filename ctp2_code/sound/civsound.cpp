@@ -42,18 +42,12 @@
 #include "SoundRecord.h"
 #include "prjfile.h"
 
-#if defined(USE_SDL)
-#include <SDL2/SDL_rwops.h>
-#endif
+#include <SDL3/SDL.h>
 
 extern ProjectFile  *g_SoundPF;
 
 CivSound::CivSound(const uint32 &associatedObject, const sint32 &soundID)
-#if !defined(USE_SDL)
-  : m_hAudio(0),
-#else
-  : m_Audio(0), m_Channel(-1),
-#endif
+  : m_Audio(nullptr), m_Channel(-1), m_soundTrack(nullptr),
     m_associatedObject(associatedObject)
 
 {
@@ -80,29 +74,19 @@ CivSound::CivSound(const uint32 &associatedObject, const sint32 &soundID)
     m_dataptr   = g_SoundPF->getData(m_soundFilename, l_dataSize);
     m_datasize  = static_cast<sint32>(l_dataSize);
 
-#if !defined(USE_SDL)
-	m_hAudio = AIL_quick_load_mem(m_dataptr, m_datasize);
-#else
 # if 0
     // Argh, audio format mismatch!!!
 	m_Audio = Mix_QuickLoad_RAW((Uint8 *) m_dataptr, (Uint32) m_datasize);
 # else
-    m_Audio = Mix_LoadWAV_RW(SDL_RWFromMem(m_dataptr, static_cast<int>(m_datasize)), 1);
+    m_Audio = MIX_LoadAudio_IO(NULL, SDL_IOFromMem(m_dataptr, static_cast<int>(m_datasize)), 0, 1);
 # endif
-#endif
 }
 
 CivSound::~CivSound()
 {
-#if !defined(USE_SDL)
-    if (m_hAudio) {
-        AIL_quick_unload(m_hAudio);
-	}
-#else
 	if (m_Audio) {
-		Mix_FreeChunk(m_Audio);
+		MIX_DestroyAudio(m_Audio);
 	}
-#endif
 
     if (m_dataptr) {
         g_SoundPF->freeData(m_dataptr);
@@ -115,8 +99,7 @@ CivSound::GetAssociatedObject() const
 	return m_associatedObject;
 }
 
-#if defined(USE_SDL)
-Mix_Chunk *
+MIX_Audio *
 CivSound::GetAudio() const
 {
 	return m_Audio;
@@ -128,13 +111,13 @@ CivSound::GetChannel() const
     return m_Channel;
 }
 
-#else
-HAUDIO
-CivSound::GetHAudio() const
+
+MIX_Track *
+CivSound::GetTrack() const
 {
-	return m_hAudio;
+	return m_soundTrack;
 }
-#endif
+
 
 MBCHAR
 *CivSound::GetSoundFilename()
@@ -166,13 +149,17 @@ CivSound::IsPlaying() const
 	return m_isPlaying;
 }
 
-#if defined(USE_SDL)
 void
 CivSound::SetChannel(const int &channel)
 {
     m_Channel = channel;
 }
-#endif
+
+void
+CivSound::SetTrack(MIX_Track *track)
+{
+    m_soundTrack = track;
+}
 
 void
 CivSound::SetIsLooping(const BOOL &looping)
@@ -189,25 +176,15 @@ CivSound::SetIsPlaying(const BOOL &is)
 void
 CivSound::SetVolume(const sint32 &volume)
 {
-#if !defined(USE_SDL)
-    if (0 == m_hAudio) {
-#else
-    if (0 == m_Audio) {
-#endif
-        return;
-    }
+    if (0 == m_Audio) return;
 
-	// Assume max volume is 10...
-	sint32 scaledVolume = (sint32)((double)volume * 12.7);
+	// Scale volume from 0-SLIDER_FULL to 0-MIX_MAX_VOLUME
+	float scaledVolume = (float)((double)volume * (double)MIX_MAX_VOLUME / 10); //SLIDER_FULL=10
 
-#if defined(USE_SDL)
-	if (scaledVolume > MIX_MAX_VOLUME) {
-		Mix_VolumeChunk(m_Audio, MIX_MAX_VOLUME);
-	} else {
-		Mix_VolumeChunk(m_Audio, (Uint8) scaledVolume);
-	}
-#else
-	AIL_quick_set_volume(m_hAudio, scaledVolume, 64);
-#endif
+	if (scaledVolume > MIX_MAX_VOLUME)
+		scaledVolume = (float)MIX_MAX_VOLUME;
+
+	MIX_SetTrackGain(m_soundTrack, scaledVolume);
 	m_volume = volume;
 }
+

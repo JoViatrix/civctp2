@@ -36,8 +36,8 @@
 
 #include "aui_base.h"
 #if defined(__AUI_USE_SDL__)
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_thread.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_thread.h>
 #endif
 
 enum AUI_SURFACE_PIXELFORMAT
@@ -133,7 +133,7 @@ public:
 protected:
 	static sint32 m_surfaceRefCount;
 #if defined(__AUI_USE_SDL__)
-	static SDL_mutex *m_cs;
+	static SDL_Mutex *m_cs;
 #else
 	static	CRITICAL_SECTION	m_cs;
 #endif

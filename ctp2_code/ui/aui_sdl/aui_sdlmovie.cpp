@@ -18,7 +18,7 @@ extern "C" {
 	#include <libswresample/swresample.h>
 	#include "libswscale/swscale.h"
 }
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 #include "profileDB.h"
 #include "aui_sdlsurface.h"
 

@@ -54,7 +54,15 @@ dnl LT_INIT
 
 AM_PATH_DIRECTX
 AM_PATH_DXMEDIA
-AM_PATH_SDL2
+
+PKG_CHECK_MODULES([SDL3], [sdl3 >= 3.0.0], [
+  AC_DEFINE([USE_SDL], [1], [Use the SDL-library])
+  CFLAGS="$CFLAGS $SDL3_CFLAGS"
+  LIBS="$LIBS $SDL3_LIBS"
+], [
+  AC_MSG_ERROR([SDL3 not found. Install libsdl3-dev or sdl3-devel.])
+])
+
 AM_PATH_SDL_FFMPEG
 AC_PATH_X
 AC_PATH_XTRA

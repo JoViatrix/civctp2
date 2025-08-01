@@ -16,12 +16,12 @@
 #endif
 #include <unistd.h>
 #include <ctype.h>
-#include <SDL2/SDL_timer.h>
+#include <SDL3/SDL_timer.h>
 
 #include "windows.h"
 
 #ifdef USE_SDL
-  #include "SDL2/SDL.h"
+  #include "SDL3/SDL.h"
 #endif
 
 // @ToDo: _fullpath is the version of ptitSeb's branch, check whether there
@@ -129,7 +129,7 @@ void _splitpath( const char *path,
   const char *dot = strrchr(basename(extc), '.');
   if(ext){
     if(!dot || dot == fname)
-      ext= "";
+      ext[0] = '\0'; // '\0' == "";
     else
       strcpy(ext, dot + 1); // expecting pre-allocted array by caller
 }
@@ -171,12 +171,12 @@ sint32 MessageBox(HWND parent, const CHAR* msg, const CHAR* title, sint32 flags)
 		case MB_OKCANCEL:
 			data.numbuttons = 1;
 			buttonData[0].flags = SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT;
-			buttonData[0].buttonid = IDOK;
+			buttonData[0].buttonID = IDOK;
 			buttonData[0].text = "OK";
 			if (flags == MB_OKCANCEL) {
 				data.numbuttons = 2;
 				buttonData[1].flags = SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT;
-				buttonData[1].buttonid = IDCANCEL;
+				buttonData[1].buttonID = IDCANCEL;
 				buttonData[1].text = "Cancel";
 			}
 			break;
@@ -184,13 +184,13 @@ sint32 MessageBox(HWND parent, const CHAR* msg, const CHAR* title, sint32 flags)
 		case MB_ABORTRETRYIGNORE:
 			data.numbuttons = 3;
 			buttonData[0].flags = SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT;
-			buttonData[0].buttonid = IDABORT;
+			buttonData[0].buttonID = IDABORT;
 			buttonData[0].text = "Abort";
 			buttonData[1].flags = 0;
-			buttonData[1].buttonid = IDRETRY;
+			buttonData[1].buttonID = IDRETRY;
 			buttonData[1].text = "Retry";
 			buttonData[2].flags = SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT;
-			buttonData[2].buttonid = IDIGNORE;
+			buttonData[2].buttonID = IDIGNORE;
 			buttonData[2].text = "Ignore";
 			break;
 
@@ -198,16 +198,16 @@ sint32 MessageBox(HWND parent, const CHAR* msg, const CHAR* title, sint32 flags)
 		case MB_YESNOCANCEL:
 			data.numbuttons = 2;
 			buttonData[0].flags = SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT;
-			buttonData[0].buttonid = IDYES;
+			buttonData[0].buttonID = IDYES;
 			buttonData[0].text = "Yes";
 			buttonData[1].flags = SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT;
-			buttonData[1].buttonid = IDNO;
+			buttonData[1].buttonID = IDNO;
 			buttonData[1].text = "No";
 			if (flags == MB_YESNOCANCEL) {
 				data.numbuttons = 3;
 				buttonData[1].flags = 0;
 				buttonData[2].flags = SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT;
-				buttonData[2].buttonid = IDCANCEL;
+				buttonData[2].buttonID = IDCANCEL;
 				buttonData[2].text = "Cancel";
 			}
 			break;
@@ -215,30 +215,30 @@ sint32 MessageBox(HWND parent, const CHAR* msg, const CHAR* title, sint32 flags)
 		case MB_RETRYCANCEL:
 			data.numbuttons = 2;
 			buttonData[0].flags = SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT;
-			buttonData[0].buttonid = IDRETRY;
+			buttonData[0].buttonID = IDRETRY;
 			buttonData[0].text = "Retry";
 			buttonData[1].flags = SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT;
-			buttonData[1].buttonid = IDCANCEL;
+			buttonData[1].buttonID = IDCANCEL;
 			buttonData[1].text = "Cancel";
 			break;
 
 		case MB_CANCELTRYCONTINUE:
 			data.numbuttons = 3;
 			buttonData[0].flags = SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT;
-			buttonData[0].buttonid = IDCONTINUE;
+			buttonData[0].buttonID = IDCONTINUE;
 			buttonData[0].text = "Continue";
 			buttonData[1].flags = 0;
-			buttonData[1].buttonid = IDTRYAGAIN;
+			buttonData[1].buttonID = IDTRYAGAIN;
 			buttonData[1].text = "Try";
 			buttonData[2].flags = SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT;
-			buttonData[2].buttonid = IDCANCEL;
+			buttonData[2].buttonID = IDCANCEL;
 			buttonData[2].text = "Cancel";
 			break;
 
 		default:
 			data.numbuttons = 1;
 			buttonData[0].flags = SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT;
-			buttonData[0].buttonid = IDOK;
+			buttonData[0].buttonID = IDOK;
 			buttonData[0].text = "OK";
 			break;
 	}
@@ -253,7 +253,7 @@ sint32 MessageBox(HWND parent, const CHAR* msg, const CHAR* title, sint32 flags)
 	int selectedButton = IDFAIL;
 	SDL_ShowMessageBox(&data, &selectedButton);
 	if (selectedButton == -1) {
-		selectedButton = buttonData[0].buttonid;
+		selectedButton = buttonData[0].buttonID;
 	}
 	return selectedButton;
 #else

@@ -31,8 +31,8 @@
 //
 // Modifications from the original Activision code:
 //
-// - Added put and get methods for MBCHAR* (Aug 24th 2005 Martin Gühmann)
-// - Removed DoubleUp method. (Sep 9th 2005 Martin Gühmann)
+// - Added put and get methods for MBCHAR* (Aug 24th 2005 Martin Gï¿½hmann)
+// - Removed DoubleUp method. (Sep 9th 2005 Martin Gï¿½hmann)
 //
 //----------------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ class CivArchive;
 #include "ctp2_inttypes.h"
 
 #if defined(__AUI_USE_SDL__)
-#include <SDL_endian.h>
+#include <SDL3/SDL_endian.h> // #include <SDL_endian.h>
 #endif
 
 #define k_ARCHIVE_MAGIC_VALUE_1	'OTAK'
@@ -68,9 +68,9 @@ class DataCheck ;
 #endif
 
 #if !defined(__AUI_USE_SDL__)
-#define SDL_SwapLE16(x) (x)
-#define SDL_SwapLE32(x) (x)
-#define SDL_SwapLE64(x) (x)
+#define SDL_Swap16(x) (x)
+#define SDL_Swap32(x) (x)
+#define SDL_Swap64(x) (x)
 #endif
 
 class CivArchive : public IC3CivArchive
@@ -166,27 +166,27 @@ public:
 			Store((uint8 *)&val, sizeof(uint8));
 		}
 		void PutSINT16(const sint16 &val) {
-			sint16 temp = SDL_SwapLE16(val);
+			sint16 temp = SDL_Swap16(val);
 			Store((uint8 *)&temp, sizeof(temp));
 		}
 		void PutUINT16(const uint16 &val) {
-			uint16 temp = SDL_SwapLE16(val);
+			uint16 temp = SDL_Swap16(val);
 			Store((uint8 *)&temp, sizeof(temp));
 		}
 		void PutSINT32(const sint32 &val) {
-			sint32 temp = SDL_SwapLE32(val);
+			sint32 temp = SDL_Swap32(val);
 			Store((uint8 *)&temp, sizeof(temp));
 		}
 		void PutUINT32(const uint32 &val) {
-			uint32 temp = SDL_SwapLE32(val);
+			uint32 temp = SDL_Swap32(val);
 			Store((uint8 *)&temp, sizeof(temp));
 		}
 		void PutSINT64(const sint64 &val) {
-			sint64 temp = SDL_SwapLE64(val);
+			sint64 temp = SDL_Swap64(val);
 			Store((uint8 *)&temp, sizeof(temp));
 		}
 		void PutUINT64(const uint64 &val) {
-			uint64 temp = SDL_SwapLE64(val);
+			uint64 temp = SDL_Swap64(val);
 			Store((uint8 *)&temp, sizeof(temp));
 		}
 		void PutMBCHAR(const MBCHAR *val) {
@@ -252,32 +252,32 @@ public:
 		sint16 GetSINT16(void) {
 			sint16 val;
 			Load((uint8 *)&val, sizeof(val));
-			return SDL_SwapLE16(val);
+			return SDL_Swap16(val);
 		}
 		uint16 GetUINT16(void) {
 			uint16 val;
 			Load((uint8 *)&val, sizeof(val));
-			return SDL_SwapLE16(val);
+			return SDL_Swap16(val);
 		}
 		sint32 GetSINT32(void) {
 			sint32 val;
 			Load((uint8 *)&val, sizeof(val));
-			return SDL_SwapLE32(val);
+			return SDL_Swap32(val);
 		}
 		uint32 GetUINT32(void) {
 			uint32 val;
 			Load((uint8 *)&val, sizeof(val));
-			return SDL_SwapLE32(val);
+			return SDL_Swap32(val);
 		}
 		sint64 GetSINT64(void) {
 			sint64 val;
 			Load((uint8 *)&val, sizeof(val));
-			return SDL_SwapLE64(val);
+			return SDL_Swap64(val);
 		}
 		uint64 GetUINT64(void) {
 			uint64 val;
 			Load((uint8 *)&val, sizeof(val));
-			return SDL_SwapLE64(val);
+			return SDL_Swap64(val);
 		}
 		MBCHAR *GetMBCHAR(void) {
 			uint32 len = GetUINT32();
