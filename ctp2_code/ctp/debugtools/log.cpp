@@ -186,7 +186,7 @@ struct Logging
 
 	time_t				base_time;
 #ifdef USE_SDL
-	SDL_mutex * entered;
+	SDL_Mutex * entered;
 #else
 	CRITICAL_SECTION	entered;
 #endif
@@ -348,7 +348,7 @@ void Log_Open (const char *config_file, int number)
 
 #ifdef USE_SDL
 	logging->entered = SDL_CreateMutex();
-	SDL_mutexP(logging->entered);
+	SDL_LockMutex(logging->entered);
 #else
 	InitializeCriticalSection(&logging->entered);
 	EnterCriticalSection(&logging->entered);
@@ -380,7 +380,7 @@ void Log_Open (const char *config_file, int number)
 	Log_InitReadConfig (config_file, name);
 
 #ifdef USE_SDL
-	SDL_mutexV(logging->entered);
+	SDL_UnlockMutex(logging->entered);
 #else
 	LeaveCriticalSection(&logging->entered);
 #endif
@@ -477,7 +477,7 @@ void Log_Begin (const char *module_name, int module_line)
 	}
 
 #ifdef USE_SDL
-	SDL_mutexP(logging->entered);
+	SDL_LockMutex(logging->entered);
 #else
 	EnterCriticalSection(&logging->entered);
 #endif
@@ -633,7 +633,7 @@ void Log_End (void)
 	}
 
 #ifdef USE_SDL
-	SDL_mutexV(logging->entered);
+	SDL_UnlockMutex(logging->entered);
 #else
 	LeaveCriticalSection(&logging->entered);
 #endif

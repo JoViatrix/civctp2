@@ -331,12 +331,12 @@ BOOL ChatWindow::CheckForEasterEggs(MBCHAR *s)
 				SDL_Event event;
 				while(SDL_PollEvent(&event) && !g_letUIProcess)
 				{
-					if(event.type == SDL_QUIT)
+					if(event.type == SDL_EVENT_QUIT)
 					{
 						gDone = TRUE;
 					}
 
-					if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
+					if(event.type == SDL_EVENT_KEY_DOWN && event.key.key == SDLK_ESCAPE)
 					{
 						i = n;
 					}

@@ -1,6 +1,6 @@
 ## Apolyton Call to Power II Source Code Project
 
-This is a modest attempt at modernizing the source code so that it can be built and run on modern Linux OSes without fault and too many warnings.
+This is a modest attempt at modernizing the source code so that it can be built and run on modern Linux OSes without fault and too many warnings. Right now, I'm trying to port the game to SDL3.
 
 ## State of the attempt
 
@@ -85,7 +85,7 @@ shell> for i in `ls /media/cdrom/Setup/data/Max/ctp2_data/default/videos/`; do m
 
 This will also copy the videos to that directory.
 
-## Building on Windows
+## Building on Windows (NOT SUPPORTED FOR NOW)
 
 CTP2 was originally built on Windows with Visual Studio 6. Today, the code compiles on Visual Studio 2017 and 2019 and probably also later. The code has not been compiled on Windows with any other compiler than the Visual Studio compiler. Beside a version of Visual Studio you need:
 
@@ -129,15 +129,15 @@ CTP2 can directly be run from Visual Studio, to do so press F5 if you want to ru
 
 You will probably need GCC 5.x or later to build. The code doesn't seem to build on GCC 4.8.
 
-You will need SDL 2.0, SDL_Mixer 2.0, SDL_Image 2.0. To be able to play movies you also need ffmpeg libraries (some).
+You will need SDL3 >= 3.3.0, SDL3_Mixer >= 3.3.0, SDL3_Image >= 3.3.0. To be able to play movies you also need ffmpeg libraries (some).
 You will also need `byacc` and `flex`.
-On Debian and friends, use `sudo apt install libsdl2-dev libsdl2-mixer-dev libsdl2-image-dev libtiff-dev libavcodec-dev libavformat-dev libswscale-dev byacc flex` to install them all.
+On Debian and friends, use `sudo apt install libtiff-dev libavcodec-dev libavformat-dev libswscale-dev byacc flex` to install most of them. For SDL3 you will need to compile from source SDL3, SDL3_Mixer, SDL3_Image since SDL3 >= 3.3.0 is not yet released as stable.
 
 The build itself is pretty classing and straight forward:
 
 ```
 ./autogen.sh
-CFLAGS="$CFLAGS -O3 -fuse-ld=gold" CXXFLAGS="$CXXFLAGS -fpermissive -O3 -fuse-ld=gold" ./configure --enable-silent-rules
+CFLAGS="$CFLAGS -O3" CXXFLAGS="$CXXFLAGS -fpermissive -O3" ./configure --enable-silent-rules
 make -j$(nproc)
 ```
 
@@ -145,7 +145,7 @@ If you want to build a debug version it is:
 
 ```
 ./autogen.sh
-CFLAGS="$CFLAGS -O0 -fno-omit-frame-pointer -fuse-ld=gold" CXXFLAGS="$CXXFLAGS -fpermissive -O0 -fno-omit-frame-pointer -fuse-ld=gold" ./configure --enable-silent-rules --enable-debug
+CFLAGS="$CFLAGS -O0 -fno-omit-frame-pointer -g" CXXFLAGS="$CXXFLAGS -fpermissive -O0 -fno-omit-frame-pointer -g" ./configure --enable-silent-rules --enable-debug
 make -j$(nproc)
 ```
 

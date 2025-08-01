@@ -72,7 +72,7 @@ typedef struct PacketQueue {
 	int64_t duration;
 	int abort_request;
 	int serial;
-	SDL_mutex *mutex;
+	SDL_Mutex *mutex;
 	SDL_cond *cond;
 } PacketQueue;
 
@@ -123,7 +123,7 @@ typedef struct FrameQueue {
 	int max_size;
 	int keep_last;
 	int rindex_shown;
-	SDL_mutex *mutex;
+	SDL_Mutex *mutex;
 	SDL_cond *cond;
 	PacketQueue *pktq;
 } FrameQueue;
@@ -1720,7 +1720,7 @@ static int read_thread(void *arg)
 	int st_index[AVMEDIA_TYPE_NB];
 	AVPacket pkt1, *pkt = &pkt1;
 	int64_t stream_start_time;
-	SDL_mutex *wait_mutex = SDL_CreateMutex();
+	SDL_Mutex *wait_mutex = SDL_CreateMutex();
 	int scan_all_pmts_set = 0;
 	int64_t pkt_ts;
 

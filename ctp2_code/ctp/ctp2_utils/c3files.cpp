@@ -555,12 +555,6 @@ bool c3files_HasLegalCD()
 			}
 		}
 	}
-
-	if (g_soundManager)
-	{
-		g_soundManager->InitRedbook();
-	}
-
 	return success;
 }
 

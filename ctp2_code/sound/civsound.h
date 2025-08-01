@@ -61,8 +61,6 @@ public:
 
 	const uint32 GetAssociatedObject() const;
 	MIX_Audio    *GetAudio() const;
-    void         SetChannel(const int &channel);
-    const int    GetChannel() const;
 	void		 SetTrack(MIX_Track *track);
 	MIX_Track    *GetTrack() const;
 	MBCHAR       *GetSoundFilename();
@@ -77,7 +75,6 @@ public:
 private:
 	MIX_Audio      *m_Audio;
 	MIX_Track      *m_soundTrack;
-    int             m_Channel;
 	uint32 			m_associatedObject;
 	MBCHAR			m_soundFilename[_MAX_PATH];
 	BOOL			m_isPlaying;

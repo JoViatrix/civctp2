@@ -753,37 +753,6 @@ PRIMITIVES_ERRCODE primitives_DrawText(
 	Assert(pString);
 	if (pString == NULL) return PRIMITIVES_ERRCODE_INVALIDPARAM;
 
-#ifdef __AUI_USE_DIRECTX__
-	HDC hdc;
-	HRESULT hr;
-	COLORREF oldColor;
-	sint32 oldMode = 0;
-
-	hr = pDirectSurface->GetDC(&hdc);
-	if (hr != AUI_ERRCODE_OK) return PRIMITIVES_ERRCODE_DSGETDCFAILED;
-
-	if (bg)
-		oldMode = SetBkMode(hdc,TRANSPARENT);
-
-	oldColor = SetTextColor(hdc, color);
-
-	HFONT hOldFont = NULL;
-	if (g_hFont)
-		hOldFont = (HFONT)SelectObject(hdc,g_hFont);
-
-	TextOut(hdc,x,y,pString,strlen(pString));
-
-	if (g_hFont)
-		SelectObject(hdc,hOldFont);
-
-	SetTextColor(hdc, oldColor);
-
-	if (bg)
-		SetBkMode(hdc,oldMode);
-
-	hr = pDirectSurface->ReleaseDC(hdc);
-	if (hr != AUI_ERRCODE_OK) return PRIMITIVES_ERRCODE_DSRELEASEDCFAILED;
-#else	
 	aui_BitmapFont *font= getBitmapFont();
 
 	if(font)
@@ -794,7 +763,6 @@ PRIMITIVES_ERRCODE primitives_DrawText(
 
 		freeBitmapFont(font);
 	}
-#endif // __AUI_USE_DIRECTX__
 
 	return PRIMITIVES_ERRCODE_OK;
 }
@@ -807,51 +775,11 @@ PRIMITIVES_ERRCODE primitives_DrawBoundedText(
 		BOOL bg
 		)
 {
-#ifdef __AUI_USE_DIRECTX__
-	HDC hdc;
-	HRESULT hr;
-	COLORREF oldColor;
-	sint32 oldMode = 0;
-#endif // __AUI_USE_DIRECTX__
-
 	Assert(pDirectSurface);
 	if (pDirectSurface==NULL) return PRIMITIVES_ERRCODE_INVALIDPARAM;
 	Assert(pString);
 	if (pString==NULL) return PRIMITIVES_ERRCODE_INVALIDPARAM;
 
-#ifdef __AUI_USE_DIRECTX__
-	hr = pDirectSurface->GetDC(&hdc);
-	if (hr != AUI_ERRCODE_OK) return PRIMITIVES_ERRCODE_INVALIDPARAM;
-
-	if (bg)
-		oldMode = SetBkMode(hdc,TRANSPARENT);
-
-	oldColor = SetTextColor(hdc, g_colorSet->GetColorRef(COLOR_BUTTON_TEXT_DROP));
-
-	HFONT hOldFont = NULL;
-	if (g_hFont)
-		hOldFont = (HFONT)SelectObject(hdc,g_hFont);
-
-	DrawText(hdc,pString,-1,bound,DT_WORDBREAK);
-
-	oldColor = SetTextColor(hdc, color);
-
-	RECT bound2 = *bound;
-	OffsetRect(&bound2, -1, -1);
-	DrawText(hdc,pString,-1,&bound2,DT_WORDBREAK);
-
-	if (g_hFont)
-		SelectObject(hdc,hOldFont);
-
-	SetTextColor(hdc, oldColor);
-
-	if (bg)
-		SetBkMode(hdc,oldMode);
-
-	hr = pDirectSurface->ReleaseDC(hdc);
-	Assert(hr == AUI_ERRCODE_OK);
-	if (hr != AUI_ERRCODE_OK) return PRIMITIVES_ERRCODE_DSRELEASEDCFAILED;
-#else	
 	aui_BitmapFont *font= getBitmapFont();
 
 	if(font)
@@ -861,7 +789,6 @@ PRIMITIVES_ERRCODE primitives_DrawBoundedText(
 
 		freeBitmapFont(font);
 	}
-#endif // __AUI_USE_DIRECTX__
 
 	return PRIMITIVES_ERRCODE_OK;
 }

@@ -17,9 +17,9 @@
 
 extern CivApp*           g_civApp;
 sint32                   aui_Mouse::m_mouseRefCount = 0;
-SDL_mutex*               aui_SDLMouse::s_cs          = NULL;
+SDL_Mutex*               aui_SDLMouse::s_cs          = NULL;
 
-int SDLMouseMessageHandler(void* userdata, SDL_Event* event);
+bool SDLMouseMessageHandler(void* userdata, SDL_Event* event);
 
 uint32 HandleMouseAnimation(uint32 interval, void *param)
 {
@@ -44,7 +44,7 @@ aui_SDLMouse::aui_SDLMouse(
 	Assert(AUI_SUCCESS(*retval));
 	if (!AUI_SUCCESS(*retval)) return;
 
-	int x = 0, y = 0;
+	float x = 0, y = 0;
 	SDL_GetMouseState(&x, &y);
 	m_data.position.x = x;
 	m_data.position.y = y;
@@ -59,7 +59,7 @@ aui_SDLMouse::aui_SDLMouse(
 
 aui_SDLMouse::~aui_SDLMouse()
 {
-	SDL_DelEventWatch(SDLMouseMessageHandler, this);
+	SDL_RemoveEventWatch(SDLMouseMessageHandler, this);
 
 	if (m_animationTimer)
 	{
@@ -90,28 +90,28 @@ AUI_ERRCODE aui_SDLMouse::HandleAnim()
 	return AUI_ERRCODE_HANDLED;
 }
 
-int SDLMouseMessageHandler(void* userdata, SDL_Event* event)
+bool SDLMouseMessageHandler(void* userdata, SDL_Event* event)
 {
 	aui_SDLMouse* mouse = static_cast<aui_SDLMouse*>(userdata);
 	switch (event->type)
 	{
-		case SDL_MOUSEMOTION:
-		case SDL_MOUSEBUTTONDOWN:
-		case SDL_MOUSEBUTTONUP:
+		case SDL_EVENT_MOUSE_MOTION:
+		case SDL_EVENT_MOUSE_BUTTON_DOWN:
+		case SDL_EVENT_MOUSE_BUTTON_UP:
 			mouse->GetInput(event);
 			mouse->ManipulateInputs(mouse->GetLatestMouseEvent(), TRUE);
 			break;
 		default:
 			break;
 	}
-	return 0;
+	return false;
 }
 
 void aui_SDLMouse::GetInput(SDL_Event* event)
 {
 	switch (event->type)
 	{
-		case SDL_MOUSEMOTION:
+		case SDL_EVENT_MOUSE_MOTION:
 		{
 			m_data.time = event->motion.timestamp;
 			m_data.position.x = event->motion.x;
@@ -124,8 +124,8 @@ void aui_SDLMouse::GetInput(SDL_Event* event)
 
 			break;
 		}
-		case SDL_MOUSEBUTTONDOWN:
-		case SDL_MOUSEBUTTONUP:
+		case SDL_EVENT_MOUSE_BUTTON_DOWN:
+		case SDL_EVENT_MOUSE_BUTTON_UP:
 		{
 			m_data.time = event->button.timestamp;
 			m_data.position.x = event->button.x;
@@ -137,30 +137,30 @@ void aui_SDLMouse::GetInput(SDL_Event* event)
 					if (g_theProfileDB && g_theProfileDB->GetLeftHandedMouse())
 					{
 						// Left handed mouse so reverse the button
-						m_data.rbutton = (event->button.state == SDL_PRESSED);
+						m_data.rbutton = (event->button.down);
 					}
 					else
 					{
-						m_data.lbutton = (event->button.state == SDL_PRESSED);
+						m_data.lbutton = (event->button.down);
 					}
 					break;
 				case SDL_BUTTON_RIGHT:
 					if (g_theProfileDB && g_theProfileDB->GetLeftHandedMouse())
 					{
 						// Left handed mouse so reverse the button
-						m_data.lbutton = (event->button.state == SDL_PRESSED);
+						m_data.lbutton = (event->button.down);
 					}
 					else
 					{
-						m_data.rbutton = (event->button.state == SDL_PRESSED);
+						m_data.rbutton = (event->button.down);
 					}
 					break;
 				case SDL_BUTTON_MIDDLE:
-					m_data.mbutton = (event->button.state == SDL_PRESSED);
+					m_data.mbutton = (event->button.down);
 				case SDL_BUTTON_X1:
-					m_data.tbutton = (event->button.state == SDL_PRESSED);
+					m_data.tbutton = (event->button.down);
 				case SDL_BUTTON_X2:
-					m_data.ubutton = (event->button.state == SDL_PRESSED);
+					m_data.ubutton = (event->button.down);
 				default:
 					break;
 			}
@@ -182,7 +182,7 @@ sint32 aui_SDLMouse::ManipulateInputs(aui_MouseEvent *data, BOOL add)
 	// We have to pump event, otherwise we get into endless mouse scroll
 	SDL_PumpEvents();
 
-	SDL_mutexP(s_cs);
+	SDL_LockMutex(s_cs);
 
 	if (add)
 	{
@@ -242,7 +242,7 @@ sint32 aui_SDLMouse::ManipulateInputs(aui_MouseEvent *data, BOOL add)
 		}
 	}
 
-	SDL_mutexV(s_cs);
+	SDL_UnlockMutex(s_cs);
 
 	return numManipulated;
 }
@@ -281,7 +281,7 @@ void aui_SDLMouse::ActivateCursor(aui_Cursor *cursor)
 				SDL_SetCursor(sdlCursor);
 				if (currentSDLCursor)
 				{
-					SDL_FreeCursor(currentSDLCursor);
+					SDL_DestroyCursor(currentSDLCursor);
 				}
 
 				m_currentCursor = cursor;

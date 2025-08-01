@@ -52,11 +52,7 @@ AUI_ERRCODE aui_SDLKeyboard::GetInput( void )
 
 	if (g_secondaryKeyboardEventQueueMutex != NULL)
 	{
-		if (-1==SDL_LockMutex(g_secondaryKeyboardEventQueueMutex))
-		{
-			fprintf(stderr, "[aui_SDLKeyboard::GetInput] SDL_LockMutex failed: %s\n", SDL_GetError());
-			return AUI_ERRCODE_NODIRECTINPUTDEVICE;
-		}
+		SDL_LockMutex(g_secondaryKeyboardEventQueueMutex);
 
 		if (!g_secondaryKeyboardEventQueue.empty())
 		{
@@ -65,11 +61,7 @@ AUI_ERRCODE aui_SDLKeyboard::GetInput( void )
 			g_secondaryKeyboardEventQueue.pop();
 		}
 
-		if (-1==SDL_UnlockMutex(g_secondaryKeyboardEventQueueMutex))
-		{
-			fprintf(stderr, "[aui_SDLKeyboard::GetInput] SDL_UnlockMutex failed: %s\n", SDL_GetError());
-			return AUI_ERRCODE_NODIRECTINPUTDEVICE;
-		}
+		SDL_UnlockMutex(g_secondaryKeyboardEventQueueMutex);
 	}
 
 	if (!gotEvent)
@@ -80,14 +72,14 @@ AUI_ERRCODE aui_SDLKeyboard::GetInput( void )
 	m_data.time = SDL_GetTicks();
 	switch (event.type)
 	{
-		case SDL_KEYDOWN:
-		case SDL_KEYUP:
-			switch (event.key.keysym.sym)
+		case SDL_EVENT_KEY_DOWN:
+		case SDL_EVENT_KEY_UP:
+			switch (event.key.key)
 			{
 				case SDLK_LSHIFT:
 					if (g_c3ui->TheMouse())
 					{
-						if (event.key.state & SDL_PRESSED)
+						if (event.key.down)
 						{
 							g_c3ui->TheMouse()->SetLeftShift();
 						}
@@ -100,7 +92,7 @@ AUI_ERRCODE aui_SDLKeyboard::GetInput( void )
 				case SDLK_RSHIFT:
 					if (g_c3ui->TheMouse())
 					{
-						if (event.key.state & SDL_PRESSED)
+						if (event.key.down)
 						{
 							g_c3ui->TheMouse()->SetRightShift();
 						}
@@ -113,7 +105,7 @@ AUI_ERRCODE aui_SDLKeyboard::GetInput( void )
 				case SDLK_LCTRL:
 					if (g_c3ui->TheMouse())
 					{
-						if (event.key.state & SDL_PRESSED)
+						if (event.key.down)
 						{
 							g_c3ui->TheMouse()->SetLeftControl();
 						}
@@ -126,7 +118,7 @@ AUI_ERRCODE aui_SDLKeyboard::GetInput( void )
 				case SDLK_RCTRL:
 					if (g_c3ui->TheMouse())
 					{
-						if (event.key.state & SDL_PRESSED)
+						if (event.key.down)
 						{
 							g_c3ui->TheMouse()->SetRightControl();
 						}
@@ -147,7 +139,7 @@ AUI_ERRCODE aui_SDLKeyboard::GetInput( void )
 				case SDLK_DOWN:
 				case SDLK_LEFT:
 				case SDLK_RIGHT:
-					if (event.key.state & SDL_PRESSED)
+					if (event.key.down)
 					{
 						g_civApp->BeginKeyboardScrolling(convertSDLKey(event.key));
 					}
@@ -169,7 +161,7 @@ AUI_ERRCODE aui_SDLKeyboard::GetInput( void )
 void aui_SDLKeyboard::convertSDLKeyboardEvent(SDL_KeyboardEvent &sdlevent,
                                       aui_KeyboardEvent &auievent)
 {
-	auievent.down = (sdlevent.state & SDL_PRESSED) ? TRUE : FALSE;
+	auievent.down = (sdlevent.down) ? true : false;
 	auievent.key = convertSDLKey(sdlevent);
 	/*printf("convertSDLKeyboardEvent(): %08x %d %08x %c\n", auievent.key,
 		(sdlevent.state & SDL_PRESSED) ? TRUE : FALSE, sdlevent.keysym.sym, (sdlevent.keysym.sym>' ' && sdlevent.keysym.sym<127)?sdlevent.keysym.sym:' ');*/

@@ -1264,11 +1264,8 @@ sint32 CivApp::InitializeApp(HINSTANCE hInstance, int iCmdShow)
 #endif
 #ifdef __AUI_USE_SDL__
 	Uint32 flags = SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC | SDL_INIT_GAMEPAD | SDL_INIT_EVENTS; //why no audio?
-#if defined(_DEBUG) || defined(DEBUG)
-	flags |= SDL_INIT_NOPARACHUTE;
-#endif// _DEBUG || DEBUG
-	int rc = SDL_Init(flags);
-	if (rc != 0)
+	bool rc = SDL_Init(flags);
+	if (!rc)
 	{
 		fprintf(stderr, "Could not initialize SDL:\n%s\n", SDL_GetError());
 		return -1;

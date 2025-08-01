@@ -80,9 +80,6 @@ public:
 	void InitSoundDriver();
 	void CleanupSoundDriver();
 
-	[[deprecated("InitRedbook is deprecated and doesn't do anything. It will be removed in the future")]]
-	void InitRedbook();
-
 	void CleanupRedbook();
 
 	void DumpAllSounds();
@@ -133,9 +130,6 @@ public:
 
 	const sint32     GetLastTrack() const;
 	void             SetLastTrack(const sint32 &track);
-
-	[[deprecated("PlayManagedSound is deprecated and doesn't do anything. It will be removed in the future.")]]
-	void PlayManagedSound(const MBCHAR *fullFilename, const bool &bNoWait);
 
 	[[deprecated("ReleaseSoundDriver is deprecated and will be removed in the future.")]]
 	void ReleaseSoundDriver();

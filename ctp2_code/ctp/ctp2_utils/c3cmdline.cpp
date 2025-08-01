@@ -5842,13 +5842,13 @@ void FastRoundCommand::Execute(sint32 argc, char **argv)
 
 #if __AUI_USE_SDL__
 			while (1) {
-				int n = SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_MOUSEMOTION - 1);
+				int n = SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_EVENT_FIRST, SDL_EVENT_MOUSE_MOTION - 1);
 				if (0 > n) {
 					fprintf(stderr, "[FastRoundCommand::Execute] PeepEvents failed:\n%s\n", SDL_GetError());
 					break;
 				}
 				if (0 == n) {
-					n = SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_MOUSEWHEEL + 1, SDL_LASTEVENT);
+					n = SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_EVENT_MOUSE_WHEEL + 1, SDL_EVENT_LAST);
 					if (0 > n) {
 						fprintf(stderr, "[FastRoundCommand::Execute] PeepEvents failed:\n%s\n", SDL_GetError());
 						break;
@@ -5859,13 +5859,13 @@ void FastRoundCommand::Execute(sint32 argc, char **argv)
 						break;
 					}
 				}
-				if (SDL_QUIT == event.type) {
+				if (SDL_EVENT_QUIT == event.type) {
 					gDone = TRUE;
 				}
-				if (SDL_KEYDOWN == event.type)
+				if (SDL_EVENT_KEY_DOWN == event.type)
 				{
 					SDL_KeyboardEvent key = event.key;
-					if (SDLK_ESCAPE == key.keysym.sym)
+					if (SDLK_ESCAPE == key.key)
 						i = n;
 				}
 			}

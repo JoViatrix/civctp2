@@ -217,8 +217,8 @@ void keypress_QuitCallback( sint32 val )
 		PostMessage(gHwnd, WM_CLOSE, 0, 0);
 #elif defined(__AUI_USE_SDL__)
 		static SDL_Event quit = { 0 };
-		quit.type = SDL_QUIT;
-		quit.quit.type = SDL_QUIT;
+		quit.type = SDL_EVENT_QUIT;
+		quit.quit.type = SDL_EVENT_QUIT;
 		int e = SDL_PushEvent(&quit);
 #endif
 	}

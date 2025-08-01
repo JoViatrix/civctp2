@@ -47,7 +47,7 @@
 extern ProjectFile  *g_SoundPF;
 
 CivSound::CivSound(const uint32 &associatedObject, const sint32 &soundID)
-  : m_Audio(nullptr), m_Channel(-1), m_soundTrack(nullptr),
+  : m_Audio(nullptr), m_soundTrack(nullptr),
     m_associatedObject(associatedObject)
 
 {
@@ -86,6 +86,7 @@ CivSound::~CivSound()
 {
 	if (m_Audio) {
 		MIX_DestroyAudio(m_Audio);
+		MIX_DestroyTrack(m_soundTrack);
 	}
 
     if (m_dataptr) {
@@ -104,13 +105,6 @@ CivSound::GetAudio() const
 {
 	return m_Audio;
 }
-
-const int
-CivSound::GetChannel() const
-{
-    return m_Channel;
-}
-
 
 MIX_Track *
 CivSound::GetTrack() const
@@ -150,12 +144,6 @@ CivSound::IsPlaying() const
 }
 
 void
-CivSound::SetChannel(const int &channel)
-{
-    m_Channel = channel;
-}
-
-void
 CivSound::SetTrack(MIX_Track *track)
 {
     m_soundTrack = track;
@@ -184,7 +172,9 @@ CivSound::SetVolume(const sint32 &volume)
 	if (scaledVolume > MIX_MAX_VOLUME)
 		scaledVolume = (float)MIX_MAX_VOLUME;
 
-	MIX_SetTrackGain(m_soundTrack, scaledVolume);
-	m_volume = volume;
+	if (MIX_SetTrackGain(m_soundTrack, scaledVolume))
+		m_volume = volume;
+	else
+		SDL_Log("MIX_SetTrackGain(m_soundTrack, scaledVolume) failed: %s", SDL_GetError());
 }
 

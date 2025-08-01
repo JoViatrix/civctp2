@@ -17,26 +17,49 @@ sint32 aui_SDL::m_SDLRefCount = 0;
 //    SDL_KEYMAPCHANGED           /**< Keymap changed due to a system event such as an
 //                                     input language or keyboard layout change.
 //                                */
-int FilterEvents(void* userData, SDL_Event *event)
+bool FilterEvents(void* userData, SDL_Event *event)
 {
 	switch(event->type)
 	{
 		// Quit event
-		case SDL_QUIT:
+		case SDL_EVENT_QUIT:
 		// Keyboard events
-		case SDL_KEYDOWN:
-		case SDL_KEYUP:
-		case SDL_TEXTINPUT:
+		case SDL_EVENT_KEY_DOWN:
+		case SDL_EVENT_KEY_UP:
+		case SDL_EVENT_TEXT_INPUT:
 		// Mouse events
-		case SDL_MOUSEMOTION:
-		case SDL_MOUSEBUTTONDOWN:
-		case SDL_MOUSEBUTTONUP:
-		case SDL_MOUSEWHEEL:
+		case SDL_EVENT_MOUSE_MOTION:
+		case SDL_EVENT_MOUSE_BUTTON_DOWN:
+		case SDL_EVENT_MOUSE_BUTTON_UP:
+		case SDL_EVENT_MOUSE_WHEEL:
 		// Window event
-		case SDL_WINDOWEVENT:
-			return 1;
+		case SDL_EVENT_WINDOW_SHOWN:
+		case SDL_EVENT_WINDOW_HIDDEN:
+		case SDL_EVENT_WINDOW_EXPOSED:
+		case SDL_EVENT_WINDOW_MOVED:
+		case SDL_EVENT_WINDOW_RESIZED:
+		case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+		case SDL_EVENT_WINDOW_METAL_VIEW_RESIZED:
+		case SDL_EVENT_WINDOW_MINIMIZED:
+		case SDL_EVENT_WINDOW_MAXIMIZED:
+		case SDL_EVENT_WINDOW_RESTORED:
+		case SDL_EVENT_WINDOW_MOUSE_ENTER:
+		case SDL_EVENT_WINDOW_MOUSE_LEAVE:
+		case SDL_EVENT_WINDOW_FOCUS_GAINED:
+		case SDL_EVENT_WINDOW_FOCUS_LOST:
+		case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+		case SDL_EVENT_WINDOW_HIT_TEST:
+		case SDL_EVENT_WINDOW_ICCPROF_CHANGED:
+		case SDL_EVENT_WINDOW_DISPLAY_CHANGED:
+		case SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED:
+		case SDL_EVENT_WINDOW_SAFE_AREA_CHANGED:
+		case SDL_EVENT_WINDOW_OCCLUDED:
+		case SDL_EVENT_WINDOW_ENTER_FULLSCREEN:
+		case SDL_EVENT_WINDOW_LEAVE_FULLSCREEN:
+		case SDL_EVENT_WINDOW_DESTROYED:
+			return true;
 		default:
-			return 0;
+			return false;
 	}
 }
 

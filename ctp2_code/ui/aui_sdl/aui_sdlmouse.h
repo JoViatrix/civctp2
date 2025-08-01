@@ -44,7 +44,7 @@ private:
 	SDL_TimerID m_animationTimer;
 	uint32      m_lastFrameTick;
 
-	static SDL_mutex* s_cs;
+	static SDL_Mutex* s_cs;
 };
 
 typedef aui_SDLMouse aui_NativeMouse;

@@ -120,12 +120,21 @@ AUI_ERRCODE aui_SDLUI::CreateNativeScreen( BOOL useExclusiveMode )
 	if ( !AUI_SUCCESS(errcode) ) return errcode;
 
 	m_pixelFormat = aui_Surface::TransformBppToSurfacePixelFormat(m_bpp);
-
 	// Windows are right now not resizable, the content is also be shrunken, which should not happen.
-	uint32 sdl_flags = g_theProfileDB->IsWindowedMode() ? SDL_WINDOW_ALLOW_HIGHDPI /*| SDL_WINDOW_RESIZABLE*/ : SDL_WINDOW_FULLSCREEN_DESKTOP;
+	//uint32 sdl_flags = g_theProfileDB->IsWindowedMode() ? SDL_WINDOW_HIGH_PIXEL_DENSITY /*| SDL_WINDOW_RESIZABLE*/ : SDL_WINDOW_FULLSCREEN_DESKTOP;
+	uint32 sdl_flags = SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE;
 
-	m_SDLWindow = SDL_CreateWindow("Call To Power 2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-	                               m_width, m_height, sdl_flags);
+	SDL_PropertiesID props = SDL_CreateProperties();
+	SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, "Call To Power 2");
+	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, SDL_WINDOWPOS_CENTERED);
+	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, SDL_WINDOWPOS_CENTERED);
+	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, m_width);
+	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, m_height);
+	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER, sdl_flags);
+	m_SDLWindow = SDL_CreateWindowWithProperties(props);
+	SDL_DestroyProperties(props);
+	// m_SDLWindow = SDL_CreateWindow("Call To Power 2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+	//                                m_width, m_height, sdl_flags);
 
 	if (!m_SDLWindow)
 	{
@@ -135,14 +144,16 @@ AUI_ERRCODE aui_SDLUI::CreateNativeScreen( BOOL useExclusiveMode )
 	if (g_theProfileDB->IsWindowedMode())
 		SDL_SetWindowMinimumSize(m_SDLWindow, 800, 600); // These numbers should be constants.
 
-	m_SDLRenderer = SDL_CreateRenderer(m_SDLWindow, -1, 0);
+	m_SDLRenderer = SDL_CreateRenderer(m_SDLWindow, nullptr);
 	if (!m_SDLRenderer)
 	{
 		c3errors_FatalDialog("aui_SDLUI", "SDL renderer creation failed:\n%s\n", SDL_GetError());
 	}
 
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-	SDL_RenderSetLogicalSize(m_SDLRenderer, m_width, m_height);
+	// SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear"); - textures now default to linear filtering, use
+	// 														   SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST)
+	// 														   if you want nearest pixel mode instead
+	SDL_SetRenderLogicalPresentation(m_SDLRenderer, m_width, m_height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
 	m_SDLTexture = SDL_CreateTexture(m_SDLRenderer, aui_SDLSurface::TransformSurfacePixelFormatToSDL(m_pixelFormat),
 		SDL_TEXTUREACCESS_STREAMING, m_width, m_height);
 
@@ -349,23 +360,23 @@ AUI_ERRCODE aui_SDLUI::SDLDrawScreen( void )
 	Assert(m_primary);
 	Assert(m_SDLTexture);
 	Assert(m_SDLRenderer);
-	int errcode;
+	bool errcode;
 	errcode= SDL_UpdateTexture(m_SDLTexture, NULL, m_primary->Buffer(), m_primary->Pitch());
 #if !defined(WIN32)
 	// VS claims std::cerr is not there even so the right file is included
-	if (errcode < 0) std::cerr << "SDL error: " << SDL_GetError() << std::endl;
+	if (!errcode) std::cerr << "SDL error: " << SDL_GetError() << std::endl;
 #endif
 	errcode= SDL_RenderClear(m_SDLRenderer);
 #if !defined(WIN32)
-	if (errcode < 0) std::cerr << "SDL error: " << SDL_GetError() << std::endl;
+	if (!errcode) std::cerr << "SDL error: " << SDL_GetError() << std::endl;
 #endif
-	errcode= SDL_RenderCopy(m_SDLRenderer, m_SDLTexture, NULL, NULL);
+	errcode= SDL_RenderTexture(m_SDLRenderer, m_SDLTexture, NULL, NULL);
 #if !defined(WIN32)
-	if (errcode < 0) std::cerr << "SDL error: " << SDL_GetError() << std::endl;
+	if (!errcode) std::cerr << "SDL error: " << SDL_GetError() << std::endl;
 #endif
 	SDL_RenderPresent(m_SDLRenderer);
 
-	if (errcode < 0)
+	if (!errcode)
 		return AUI_ERRCODE_SURFACEFAILURE;
 	else
 		return AUI_ERRCODE_OK;

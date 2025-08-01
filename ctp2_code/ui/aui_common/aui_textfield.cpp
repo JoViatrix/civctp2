@@ -546,6 +546,7 @@ AUI_ERRCODE aui_TextField::DrawThis( aui_Surface *surface, sint32 x, sint32 y )
 #endif
 
 	SDL_Surface* SDLsurf = static_cast<aui_SDLSurface*>(surface)->DDS();
+	const SDL_PixelFormatDetails *SDLsurfDetails = SDL_GetPixelFormatDetails(SDLsurf->format);
 
 	MBCHAR* text     =  m_Text     + m_viewStart;
 	size_t  selStart = (m_selStart > m_viewStart) ? m_selStart - m_viewStart : 0;
@@ -553,7 +554,7 @@ AUI_ERRCODE aui_TextField::DrawThis( aui_Surface *surface, sint32 x, sint32 y )
 
 	// Fill background
 	SDL_Rect r1 = { rect.left, rect.top, rect.right-rect.left, rect.bottom-rect.top };
-	SDL_FillRect(SDLsurf, &r1, SDL_MapRGB(SDLsurf->format, GetRValue(winColor), GetGValue(winColor), GetBValue(winColor)));
+	SDL_FillSurfaceRect(SDLsurf, &r1, SDL_MapRGB(SDLsurfDetails, nullptr, GetRValue(winColor), GetGValue(winColor), GetBValue(winColor)));
 
 	m_Font->DrawString(surface, &rect, &rect, text,
 		k_AUI_BITMAPFONT_DRAWFLAG_JUSTLEFT,
@@ -570,7 +571,7 @@ AUI_ERRCODE aui_TextField::DrawThis( aui_Surface *surface, sint32 x, sint32 y )
 	if (m_blink && GetKeyboardFocus() == this)
 	{
 		SDL_Rect r2 = { rect.left + offset - 1, rect.top + 2, 2, rect.bottom - rect.top - 4 };
-		SDL_FillRect(SDLsurf, &r2, SDL_MapRGB(SDLsurf->format, GetRValue(winTextColor), GetGValue(winTextColor), GetBValue(winTextColor)));
+		SDL_FillSurfaceRect(SDLsurf, &r2, SDL_MapRGB(SDLsurfDetails, nullptr, GetRValue(winTextColor), GetGValue(winTextColor), GetBValue(winTextColor)));
 	}
 #endif
 
@@ -719,12 +720,12 @@ void aui_TextField::MouseLDoubleClickInside(aui_MouseEvent * mouseData)
 	m_Font->GetLineInfo(&rect, &penPos, NULL, NULL, &start, stop, true, true);
 
 	// Get the system preferred locale
-	SDL_Locale* locales = SDL_GetPreferredLocales();
+	SDL_Locale** locales = SDL_GetPreferredLocales(nullptr);
 
 	std::locale loc;
 	try
 	{
-		loc = std::locale(locales[0].language);
+		loc = std::locale(locales[0]->language);
 	}
 	catch(std::runtime_error&)
 	{
@@ -759,12 +760,12 @@ void aui_TextField::MouseLDoubleClickInside(aui_MouseEvent * mouseData)
 void aui_TextField::SelectWordStart()
 {
 	// Get the system preferred locale
-	SDL_Locale* locales = SDL_GetPreferredLocales();
+	SDL_Locale** locales = SDL_GetPreferredLocales(nullptr);
 
 	std::locale loc;
 	try
 	{
-		loc = std::locale(locales[0].language);
+		loc = std::locale(locales[0]->language);
 	}
 	catch(std::runtime_error&)
 	{
@@ -789,12 +790,12 @@ void aui_TextField::SelectWordStart()
 void aui_TextField::SelectWordEnd()
 {
 	// Get the system preferred locale
-	SDL_Locale* locales = SDL_GetPreferredLocales();
+	SDL_Locale** locales = SDL_GetPreferredLocales(nullptr);
 
 	std::locale loc;
 	try
 	{
-		loc = std::locale(locales[0].language);
+		loc = std::locale(locales[0]->language);
 	}
 	catch(std::runtime_error&)
 	{

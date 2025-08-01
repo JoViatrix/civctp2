@@ -217,8 +217,6 @@ int messagewin_CreateMessage( Message data, BOOL bRecreate )
 
 			if (g_civPaths->FindFile(C3DIR_SOUNDS, wavName, filename))
 			{
-				if (g_soundManager)
-					g_soundManager->PlayManagedSound(filename, false);
 			}
 		}
 	}
@@ -236,8 +234,6 @@ int messagewin_CreateModalMessage(Message data)
 		MBCHAR filename[ _MAX_PATH ];
 		if (g_civPaths->FindFile( C3DIR_SOUNDS, wavName, filename))
 		{
-			if (g_soundManager)
-				g_soundManager->PlayManagedSound(filename, false);
 		}
 	}
 

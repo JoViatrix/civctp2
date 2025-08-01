@@ -26,7 +26,7 @@
 //
 // - Cleanup improved.
 // - Don't reset user changes when returning from the track selection window.
-// - Initialized local variables. (Sep 9th 2005 Martin Gühmann)
+// - Initialized local variables. (Sep 9th 2005 Martin Gï¿½hmann)
 //
 //----------------------------------------------------------------------------
 
@@ -221,7 +221,6 @@ void musicscreen_acceptPress(aui_Control *control, uint32 action, uint32 data, v
 
 		if ( s_useMusicOn ) {
 			g_soundManager->EnableMusic();
-			g_soundManager->InitRedbook();
 		} else {
 			g_soundManager->DisableMusic();
 			g_soundManager->CleanupRedbook();

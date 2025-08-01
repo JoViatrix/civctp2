@@ -54,7 +54,7 @@ AUI_ERRCODE aui_SDLBlitter::Blt16To16(
 		}
 */
 		//there seems no need for all this
-		if (SDL_BlitSurface(sdlSrc->DDS(), &ssrc, sdlDest->DDS(), &sdst) < 0)
+		if (!SDL_BlitSurface(sdlSrc->DDS(), &ssrc, sdlDest->DDS(), &sdst))
 		{
 			fprintf(stderr, "%s L%d: Blit failed: %s\n", __FILE__, __LINE__, SDL_GetError());
 			retcode = AUI_ERRCODE_BLTFAILED;
@@ -104,7 +104,7 @@ AUI_ERRCODE aui_SDLBlitter::ColorBlt16(
 		                  destRect->right-destRect->left, destRect->bottom-destRect->top
 		                };
 
-		if (SDL_FillRect(sdlDest->DDS(), &sdst, color) < 0)
+		if (!SDL_FillSurfaceRect(sdlDest->DDS(), &sdst, color))
 		{
 			fprintf(stderr, "FillRect failed: %s\n", SDL_GetError());
 			retcode = AUI_ERRCODE_BLTFAILED;
@@ -141,7 +141,7 @@ static AUI_ERRCODE SimpleHVStretch(SDL_Surface* src, SDL_Rect* rsrc,
 	if (rdst->h <= 1 && rdst->w <= 1)
 	{
 		// copy only (at most) the top-left pixel
-		if (SDL_BlitSurface(src, rdst, dst, rdst) < 0)
+		if (!SDL_BlitSurface(src, rdst, dst, rdst))
 		{
 			fprintf(stderr, "Blt failed: %s\n", SDL_GetError());
 			return AUI_ERRCODE_BLTFAILED;
@@ -151,7 +151,7 @@ static AUI_ERRCODE SimpleHVStretch(SDL_Surface* src, SDL_Rect* rsrc,
 
 	if (SDL_MUSTLOCK(src))
 	{
-		if (SDL_LockSurface(src) < 0)
+		if (!SDL_LockSurface(src))
 		{
 			fprintf(stderr, "StretchBlt: lock src failed: %s\n", SDL_GetError());
 			return AUI_ERRCODE_BLTFAILED;
@@ -160,7 +160,7 @@ static AUI_ERRCODE SimpleHVStretch(SDL_Surface* src, SDL_Rect* rsrc,
 
 	if (SDL_MUSTLOCK(dst))
 	{
-		if (SDL_LockSurface(dst) < 0)
+		if (!SDL_LockSurface(dst))
 		{
 			fprintf(stderr, "StretchBlt: lock dst failed: %s\n", SDL_GetError());
 			SDL_UnlockSurface(src);
@@ -192,6 +192,8 @@ static AUI_ERRCODE SimpleHVStretch(SDL_Surface* src, SDL_Rect* rsrc,
 			int esx = rsrc->x + rsrc->w;	// end source x
 			Uint16* dptr = (Uint16*)(t8 + dy*dst->pitch);
 			Uint16* sptr = (Uint16*)(f8 + sy*src->pitch);
+			const SDL_PixelFormatDetails * srcd = nullptr;
+			const SDL_PixelFormatDetails * dstd = nullptr;
 
 			while (dx < edx && sx < esx)
 			{
@@ -199,8 +201,10 @@ static AUI_ERRCODE SimpleHVStretch(SDL_Surface* src, SDL_Rect* rsrc,
 				while (lx >= 0 && dx < edx && sx < esx)
 				{
 					// write source pixel sx
-					Assert(src->format->BytesPerPixel == 2);
-					Assert(dst->format->BytesPerPixel == 2);
+					srcd = SDL_GetPixelFormatDetails(src->format);
+					dstd = SDL_GetPixelFormatDetails(dst->format);
+					Assert(srcd->bytes_per_pixel == 2);
+					Assert(dstd->bytes_per_pixel == 2);
 					dptr[dx] = sptr[sx];
 					lx -= rsrc->w-1;
 					++dx;
@@ -238,7 +242,7 @@ static AUI_ERRCODE SimpleHStretch(SDL_Surface* src, SDL_Rect* rsrc,
 	if (rdst->w <= 1)
 	{
 		// copy only (at most) the first line
-		if (SDL_BlitSurface(src, rdst, dst, rdst) < 0)
+		if (!SDL_BlitSurface(src, rdst, dst, rdst))
 		{
 			fprintf(stderr, "Blt failed: %s\n", SDL_GetError());
 			return AUI_ERRCODE_BLTFAILED;
@@ -258,7 +262,7 @@ static AUI_ERRCODE SimpleVStretch(SDL_Surface* src, SDL_Rect* rsrc,
 	if (rdst->h <= 1)
 	{
 		// copy only (at most) the first column
-		if (SDL_BlitSurface(src, rdst, dst, rdst) < 0)
+		if (!SDL_BlitSurface(src, rdst, dst, rdst))
 		{
 			fprintf(stderr, "Blt failed: %s\n", SDL_GetError());
 			return AUI_ERRCODE_BLTFAILED;
@@ -305,7 +309,7 @@ AUI_ERRCODE aui_SDLBlitter::StretchBlt16To16(
 			if (ssrc.h == sdst.h)
 			{
 				//fprintf(stderr, "%s L%d: Using normal blit!\n", __FILE__, __LINE__);
-				if (SDL_BlitSurface(sdlSrc->DDS(), &ssrc, sdlDest->DDS(), &sdst) < 0)
+				if (!SDL_BlitSurface(sdlSrc->DDS(), &ssrc, sdlDest->DDS(), &sdst))
 				{
 					fprintf(stderr, "StrechBlt failed: %s\n", SDL_GetError());
 					retcode = AUI_ERRCODE_BLTFAILED;

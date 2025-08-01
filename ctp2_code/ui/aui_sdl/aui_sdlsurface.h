@@ -30,7 +30,7 @@ protected:
 	AUI_ERRCODE InitCommon( void );
 
 public:
-	static uint32 TransformSurfacePixelFormatToSDL(const AUI_SURFACE_PIXELFORMAT pixelFormat);
+	static SDL_PixelFormat TransformSurfacePixelFormatToSDL(const AUI_SURFACE_PIXELFORMAT pixelFormat);
 
 	virtual BOOL IsThisA( uint32 classId )
 	{

@@ -146,7 +146,12 @@ void SoundManager::InitSoundDriver() //DONE//
 
 	SDL_SetPointerProperty(g_noLoopProps, MIX_PROP_PLAY_LOOPS_NUMBER, 0);
 
-	if (SDL_InitSubSystem(SDL_INIT_AUDIO)) {
+	if (!MIX_Init()) {
+		SDL_Log("MIX_Init() failed: %s", SDL_GetError());
+        return;
+	}
+
+	if (!SDL_InitSubSystem(SDL_INIT_AUDIO)) {
         SDL_Log("SDL_InitSubSystem(SDL_INIT_AUDIO) failed: %s", SDL_GetError());
         return;
     }
@@ -166,6 +171,8 @@ void SoundManager::InitSoundDriver() //DONE//
 
 	m_noSound = false;
 
+	m_musicTrack = MIX_CreateTrack(m_mixer);
+
 	SetVolume(SOUNDTYPE_SFX,   m_sfxVolume);
 	SetVolume(SOUNDTYPE_VOICE, m_voiceVolume);
 	SetVolume(SOUNDTYPE_MUSIC, m_musicVolume);
@@ -182,6 +189,7 @@ void SoundManager::CleanupSoundDriver() //DONE//
 	}
 
 	SDL_DestroyProperties(g_noLoopProps);
+	MIX_Quit();
 } //DONE//
 
 void SoundManager::CleanupRedbook() //DONE//
@@ -334,11 +342,17 @@ SoundManager::AddSound(const SOUNDTYPE &type,
     }
     else
 	{
+		sound->SetTrack(MIX_CreateTrack(m_mixer));
+
+		if (sound->GetTrack() == nullptr)
+			SDL_Log("sound->setTrack(MIX_CreateTrack(m_mixer)) in SoundManager::AddSound failed: %s", SDL_GetError());
+
+		else {
 		if (MIX_SetTrackAudio(sound->GetTrack(), sound->GetAudio()))
 				MIX_PlayTrack(sound->GetTrack(), g_noLoopProps);
 		else
-			SDL_Log("MIX_SetTrackAudio(sound->GetTrack(), sound->GetAudio()) failed: %s", SDL_GetError());
-		//sound->SetChannel(channel);
+			SDL_Log("MIX_SetTrackAudio(sound->GetTrack(), sound->GetAudio()) in SoundManager::AddSound failed: %s", SDL_GetError());
+		}
 		sound->SetIsPlaying(true);
 	}
 }
@@ -351,7 +365,7 @@ SoundManager::AddLoopingSound(const SOUNDTYPE &type,
 	if (m_noSound) return;
 
 	CivSound *existingSound = FindLoopingSound(type, associatedObject);
-	if (existingSound && (existingSound->GetSoundID() == soundID) && (existingSound->GetChannel() != -1))
+	if (existingSound && (existingSound->GetSoundID() == soundID))
 	{
 		return;
 	}
@@ -386,7 +400,6 @@ SoundManager::AddLoopingSound(const SOUNDTYPE &type,
 		MIX_PlayTrack(sound->GetTrack(), 0);
 	else
 		SDL_Log("MIX_SetTrackAudio(sound->GetTrack(), sound->GetAudio()) failed: %s", SDL_GetError());
-	//sound->SetChannel(channel);
 
 	sound->SetIsLooping(true);
 	sound->SetIsPlaying(true);

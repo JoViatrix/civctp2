@@ -26,7 +26,8 @@ aui_SDLSurface::aui_SDLSurface(
 	if (lpdds != 0 && takeOwnership) {
 		width = lpdds->w;
 		height = lpdds->h;
-		bpp = lpdds->format->BitsPerPixel;
+		const SDL_PixelFormatDetails * lpddsDetails = SDL_GetPixelFormatDetails(lpdds->format);
+		bpp = lpddsDetails->bits_per_pixel;
 	}
 	*retval = aui_Surface::InitCommon( width, height, bpp, isPrimary );
 	Assert( AUI_SUCCESS(*retval) );
@@ -46,7 +47,7 @@ aui_SDLSurface::aui_SDLSurface(
 		}
 		m_allocated = TRUE;
 		// clear it with black
-		if (SDL_FillRect(m_lpdds, NULL, 0) < 0) {
+		if (!SDL_FillSurfaceRect(m_lpdds, NULL, 0)) {
 			fprintf(stderr, "aui_Surface: Failed to erase new surface: %s\n", SDL_GetError());
 		}
 	}
@@ -75,14 +76,14 @@ aui_SDLSurface::~aui_SDLSurface()
 {
 	if ( m_allocated && m_lpdds )
 	{
-		SDL_FreeSurface(m_lpdds);
+		SDL_DestroySurface(m_lpdds);
 		m_lpdds = NULL;
 		m_allocated = FALSE;
 	}
 	SDL_DestroyMutex(m_bltMutex);
 }
 
-uint32 aui_SDLSurface::TransformSurfacePixelFormatToSDL(const AUI_SURFACE_PIXELFORMAT pixelFormat)
+SDL_PixelFormat aui_SDLSurface::TransformSurfacePixelFormatToSDL(const AUI_SURFACE_PIXELFORMAT pixelFormat)
 {
 	switch (pixelFormat)
 	{
@@ -91,9 +92,9 @@ uint32 aui_SDLSurface::TransformSurfacePixelFormatToSDL(const AUI_SURFACE_PIXELF
 		case AUI_SURFACE_PIXELFORMAT_565:
 			return SDL_PIXELFORMAT_RGB565;
 		case AUI_SURFACE_PIXELFORMAT_555:
-			return SDL_PIXELFORMAT_RGB555;
+			return SDL_PIXELFORMAT_XRGB1555;
 		case AUI_SURFACE_PIXELFORMAT_888:
-			return SDL_PIXELFORMAT_RGB888;
+			return SDL_PIXELFORMAT_XRGB8888;
 		default:
 			return SDL_PIXELFORMAT_UNKNOWN;
 	}
@@ -108,17 +109,18 @@ SDL_Surface* aui_SDLSurface::CreateSDLSurface(const int width, const int height,
 	uint32 gmask;
 	uint32 bmask;
 	uint32 amask;
-	SDL_PixelFormatEnumToMasks(TransformSurfacePixelFormatToSDL(pixelFormat), &sdlBpp, &rmask, &gmask, &bmask, &amask);
-	return SDL_CreateRGBSurface(0, width, height, sdlBpp, rmask, gmask, bmask, amask);
+	SDL_GetMasksForPixelFormat(TransformSurfacePixelFormatToSDL(pixelFormat), &sdlBpp, &rmask, &gmask, &bmask, &amask);
+	return SDL_CreateSurface(width, height, SDL_GetPixelFormatForMasks(sdlBpp, rmask, gmask, bmask, amask));
+	//return SDL_CreateRGBSurface(0, width, height, sdlBpp, rmask, gmask, bmask, amask);
 }
 
 uint32 aui_SDLSurface::SetChromaKey( uint32 color )
 {
-	int hr = SDL_SetColorKey(m_lpdds, SDL_TRUE, /*SDL_MapRGB(m_lpdds->format, color>>16, (color>>8)&0xff, color&0xff)*/color); //|SDL_RLEACCEL ?
+	bool hr = SDL_SetSurfaceColorKey(m_lpdds, true, /*SDL_MapRGB(m_lpdds->format, color>>16, (color>>8)&0xff, color&0xff)*/color); //|SDL_RLEACCEL ?
 	//hr == 0 if succeded!
 	//fprintf(stderr, "%s L%d: SDL_SRCCOLORKEY set to %#X\n", __FILE__, __LINE__, color);
 
-	if ( hr == 0 )
+	if (!hr)
 		return aui_Surface::SetChromaKey( color ); //sets aui_Surface.m_chromaKey and returns last value!
 
 	//return AUI_ERRCODE_OK;  //this is not sensible, should retrun last color key!?!
@@ -141,7 +143,7 @@ AUI_ERRCODE aui_SDLSurface::Lock( RECT *rect, LPVOID *buffer, DWORD flags ){
 	if (SDL_MUSTLOCK(m_lpdds))
 	{
 //		fprintf(stderr, "%s L%d: Locking surface! Check this!\n", __FILE__, __LINE__);
-		if (SDL_LockSurface(m_lpdds) < 0)
+		if (!SDL_LockSurface(m_lpdds))
 		{
 			fprintf(stderr, "Cannot lock surface: %s\n", SDL_GetError());
 			return AUI_ERRCODE_SURFACELOCKFAILED;
@@ -180,8 +182,8 @@ AUI_ERRCODE aui_SDLSurface::Unlock( LPVOID buffer )
 
 AUI_ERRCODE aui_SDLSurface::Blank(const uint32 &color)
 {
-	int errcode = SDL_FillRect(m_lpdds, NULL, color);
-	if (errcode == 0)
+	bool errcode = SDL_FillSurfaceRect(m_lpdds, NULL, color);
+	if (errcode)
 		return AUI_ERRCODE_OK;
 
 	return AUI_ERRCODE_BLTFAILED;
