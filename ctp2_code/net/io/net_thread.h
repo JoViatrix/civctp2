@@ -67,7 +67,7 @@ private:
 #if defined(__AUI_USE_SDL__)
 	Uint32 m_threadId;
 	SDL_Thread *m_thread;
-	SDL_mutex *m_mutex;
+	SDL_Mutex *m_mutex;
 #else
 	DWORD m_threadId;
 	HANDLE m_threadHandle;
