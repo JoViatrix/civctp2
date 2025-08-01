@@ -37,9 +37,7 @@
 #include "aui_pixel.h"
 #include "aui_ui.h"
 
-#if defined(__AUI_USE_SDL__)
 #include "aui_sdlsurface.h"
-#endif
 
 aui_Image::aui_Image(
 	AUI_ERRCODE *retval,
@@ -157,183 +155,27 @@ AUI_ERRCODE aui_BmpImageFormat::Load(MBCHAR const * filename, aui_Image *image )
 {
 	AUI_ERRCODE retcode = AUI_ERRCODE_OK;
 
-#if defined(__AUI_USE_DIRECTX__)
-	uint8 *filebits = g_ui->TheMemMap()->GetFileBits( filename );
-	Assert( filebits != NULL );
-	if ( !filebits ) return AUI_ERRCODE_HACK;
-
-	BITMAPFILEHEADER bfh;
-	memcpy( &bfh, filebits, sizeof( bfh ) );
-	uint32 foffset = sizeof( bfh );
-
-	if ( LOBYTE(bfh.bfType) != 'B' || HIBYTE(bfh.bfType) != 'M' ) {
-		g_ui->TheMemMap()->ReleaseFileBits( filebits );
-		return AUI_ERRCODE_LOADFAILED;
-	}
-
-	BITMAPINFOHEADER bih;
-	memcpy( &bih, filebits + foffset, sizeof( bih ) );
-	foffset += sizeof( bih );
-
-	if ( bih.biCompression != BI_RGB ) {
-		g_ui->TheMemMap()->ReleaseFileBits( filebits );
-		return AUI_ERRCODE_LOADFAILED;
-	}
-
-	RGBQUAD *rgbq = NULL;
-	if ( bih.biBitCount == 8 &&
-		(bfh.bfOffBits - (sizeof(bih) + sizeof(bfh)) == (256 * sizeof( RGBQUAD ))) ) {
-
-		rgbq = new RGBQUAD[256];
-		Assert( rgbq != NULL );
-		if ( !rgbq ) {
-			g_ui->TheMemMap()->ReleaseFileBits( filebits );
-			return AUI_ERRCODE_LOADFAILED;
-		}
-
-		memcpy( rgbq, filebits + foffset, ( 256 * sizeof( RGBQUAD ) ) );
-		foffset += 256 * sizeof( RGBQUAD );
-	}
-
-	uint32 width = bih.biWidth;
-	uint32 height = bih.biHeight >= 0 ? bih.biHeight : -bih.biHeight;
-
-	sint32 temp = width * bih.biBitCount / 8;
-	uint32 bmpPitch = temp + Mod(-temp,sizeof( LONG ));
-
-	uint32 bpp = g_ui->BitsPerPixel();
-
-	AUI_ERRCODE errcode = image->LoadEmpty( width, height, bpp );
-	Assert( AUI_SUCCESS(errcode) );
-	if ( !AUI_SUCCESS(errcode) )
-	{
-		g_ui->TheMemMap()->ReleaseFileBits( filebits );
-		if ( rgbq ) delete rgbq;
-		return AUI_ERRCODE_LOADFAILED;
-	}
-
-	aui_Surface *surface = image->TheSurface();
-
-	switch ( bpp )
-	{
-	case 8:
-
-		Assert( FALSE );
-		retcode = AUI_ERRCODE_LOADFAILED;
-		break;
-
-	case 16:
-		switch ( bih.biBitCount )
-		{
-		case 8:
-			errcode = aui_Pixel::Convert8To16(
-				surface,
-				filebits + foffset,
-				width,
-				height,
-				bmpPitch,
-				rgbq );
-			Assert( AUI_SUCCESS(errcode) );
-			if ( !AUI_SUCCESS(errcode) )
-				retcode = AUI_ERRCODE_LOADFAILED;
-			break;
-
-		case 16:
-
-			Assert( FALSE );
-			retcode = AUI_ERRCODE_LOADFAILED;
-			break;
-
-		case 24:
-			errcode = aui_Pixel::Convert24To16(
-				surface,
-				filebits + foffset,
-				width,
-				height,
-				bmpPitch );
-			Assert( AUI_SUCCESS(errcode) );
-			if ( !AUI_SUCCESS(errcode) )
-				retcode = AUI_ERRCODE_LOADFAILED;
-			break;
-
-		default:
-
-			Assert( FALSE );
-			retcode = AUI_ERRCODE_LOADFAILED;
-		}
-		break;
-
-	case 24:
-
-		Assert( FALSE );
-		retcode = AUI_ERRCODE_LOADFAILED;
-		break;
-
-	default:
-
-		Assert( FALSE );
-		retcode = AUI_ERRCODE_LOADFAILED;
-		break;
-	}
-
-	if ( rgbq ) delete rgbq;
-	g_ui->TheMemMap()->ReleaseFileBits( filebits );
-
-	if ( bih.biHeight > 0 )
-	{
-		LPVOID bits = NULL;
-		errcode = surface->Lock( NULL, &bits, 0 );
-		Assert( AUI_SUCCESS(errcode) );
-		if ( !AUI_SUCCESS(errcode) )
-			retcode = AUI_ERRCODE_SURFACELOCKFAILED;
-		else
-		{
-			const sint32 pitch = surface->Pitch();
-
-			uint8 *temp = new uint8[ pitch ];
-			uint8 *top = (uint8 *)bits;
-			uint8 *bot = top + pitch * ( surface->Height() - 1 );
-			for ( sint32 i = surface->Height() / 2; i; i-- )
-			{
-				memcpy( temp, top, pitch );
-				memcpy( top, bot, pitch );
-				memcpy( bot, temp, pitch );
-
-				top += pitch;
-				bot -= pitch;
-			}
-
-			delete [] temp;
-
-			errcode = surface->Unlock( bits );
-			Assert( AUI_SUCCESS(errcode) );
-			if ( !AUI_SUCCESS(errcode) )
-				retcode = AUI_ERRCODE_SURFACEUNLOCKFAILED;
-		}
-	}
-
-	return retcode;
-#elif defined(__AUI_USE_SDL__)
+#if defined(__AUI_USE_SDL__)
 	fprintf(stderr, "%s L%d: image %s!\n", __FILE__, __LINE__, filename); //is this ever called?
 	Assert(0);
 	SDL_Surface *bmp = SDL_LoadBMP(filename);
-	SDL_Surface *surf = NULL;
-	SDL_PixelFormat fmt = { 0 };
+	const SDL_PixelFormatDetails *bmpDetails = SDL_GetPixelFormatDetails(bmp->format);
+	SDL_Surface *surf = nullptr;
+	// SDL_PixelFormat fmt = { 0 };
 
 	fprintf(stderr, "%s L%d: image %s!\n", __FILE__, __LINE__, filename);
 	if (g_ui->Primary()->BitsPerPixel() != 16)
 		fprintf(stderr, "%s L%d: bpp %d", __FILE__, __LINE__,  g_ui->Primary()->BitsPerPixel());
-	if (bmp->format->Gmask >> bmp->format->Gshift == 0x3F)
+	if (bmpDetails->Gmask >> bmpDetails->Gshift == 0x3F)
 		fprintf(stderr, "%s L%d: 565 image!\n", __FILE__, __LINE__);
-	if (bmp->format->Gmask >> bmp->format->Gshift == 0x1F)
+	if (bmpDetails->Gmask >> bmpDetails->Gshift == 0x1F)
 		fprintf(stderr, "%s L%d: 555 image!\n", __FILE__, __LINE__);
 	if (NULL == surf)
 	{
-		SDL_PixelFormat *format = SDL_AllocFormat(aui_SDLSurface::TransformSurfacePixelFormatToSDL(g_ui->PixelFormat()));
-		surf = SDL_ConvertSurface(bmp, format, 0);
-		SDL_FreeFormat(format);
+		const SDL_PixelFormatDetails *format = SDL_GetPixelFormatDetails(aui_SDLSurface::TransformSurfacePixelFormatToSDL(g_ui->PixelFormat()));
+		surf = SDL_ConvertSurface(bmp, format->format);
 	}
-	SDL_FreeSurface(bmp);
+	SDL_DestroySurface(bmp);
 	if (NULL == surf)
 		return AUI_ERRCODE_LOADFAILED;
 	//surface = image->TheSurface();
