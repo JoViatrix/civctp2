@@ -39,7 +39,7 @@
 
 sint32 aui_Surface::m_surfaceRefCount = 0;
 #if defined(__AUI_USE_SDL__)
-SDL_mutex *		aui_Surface::m_cs = 0;
+SDL_Mutex *		aui_Surface::m_cs = 0;
 #else
 CRITICAL_SECTION	aui_Surface::m_cs;
 #endif
@@ -157,12 +157,13 @@ AUI_ERRCODE aui_Surface::InitCommon( sint32 width, sint32 height, sint32 bpp, BO
 #endif
 	}
 
-	if ( bpp == 16 )
+	if ( bpp == 16 ) {
 		if (g_is565Format) {
 			m_pixelFormat = AUI_SURFACE_PIXELFORMAT_565;
 		} else {
 			m_pixelFormat = AUI_SURFACE_PIXELFORMAT_555;
 		}
+	}
 
 	return AUI_ERRCODE_OK;
 }
@@ -441,7 +442,7 @@ AUI_ERRCODE aui_Surface::ManipulateLockList( RECT *rect, LPVOID *buffer, AUI_SUR
 {
 	AUI_ERRCODE errcode = AUI_ERRCODE_OK;
 #if defined(__AUI_USE_SDL__)
-	SDL_mutexP(m_cs);
+	SDL_LockMutex(m_cs);
 #else
 	EnterCriticalSection(&m_cs);
 #endif
@@ -526,7 +527,7 @@ AUI_ERRCODE aui_Surface::ManipulateLockList( RECT *rect, LPVOID *buffer, AUI_SUR
 	}
 
 #if defined(__AUI_USE_SDL__)
-	SDL_mutexV(m_cs);
+	SDL_UnlockMutex(m_cs);
 #else
 	LeaveCriticalSection(&m_cs);
 #endif
