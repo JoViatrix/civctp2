@@ -508,11 +508,6 @@ int ui_Initialize(void)
 	Assert(auiErr == AUI_ERRCODE_OK);
 	if ( auiErr != AUI_ERRCODE_OK ) return 14;
 
-#if defined(__AUI_USE_DIRECTX__)
-	while ( ShowCursor( FALSE ) >= 0 )
-	;
-#endif
-
 	return AUI_ERRCODE_OK;
 }
 
@@ -932,27 +927,10 @@ static HWND s_taskBar   = NULL;
 
 void main_HideTaskBar(void)
 {
-#if defined(__AUI_USE_DIRECTX__)
-	if (g_hideTaskBar)
-	{
-		s_taskBar = FindWindow("Shell_TrayWnd", NULL);
-
-		if (s_taskBar)
-		{
-			ShowWindow(s_taskBar, SW_HIDE);
-		}
-	}
-#endif // __AUI_USE_DIRECTX__
 }
 
 void main_RestoreTaskBar(void)
 {
-#if defined(__AUI_USE_DIRECTX__)
-	if (s_taskBar)
-	{
-		ShowWindow(s_taskBar, SW_SHOWDEFAULT);
-	}
-#endif
 }
 
 void ui_CivAppProcess(void)
@@ -1213,38 +1191,6 @@ static LONG _cdecl main_CivExceptionHandler(LPEXCEPTION_POINTERS pException)
 }
 #endif // _MSC_VER
 
-#ifdef __AUI_USE_DIRECTX__
-BOOL main_CheckDirectX(void)
-{
-	BOOL found = FALSE;
-#if defined(_X86_)
-	HANDLE dll = LoadLibrary( "dll" FILE_SEP "util" FILE_SEP "dxver" );
-	if ( dll ) {
-
-		typedef BOOL (WINAPI *FuncType)( DWORD *pVersion );
-		FuncType GetDirectXVersion = (FuncType)GetProcAddress( (HINSTANCE)dll, "MicrosoftDirectXInstalled" );
-		if ( !GetDirectXVersion )
-		{
-			FreeLibrary( (HINSTANCE)dll );
-			return AUI_ERRCODE_HACK;    /// @todo Check: effectively this means true???
-		}
-
-		if(GetDirectXVersion( &g_dxver ) > 0) {
-			found = TRUE;
-		}
-
-		FreeLibrary( (HINSTANCE)dll );
-	} else {
-		c3errors_FatalDialog("DLL", "Cannot find dxver.dll");
-	}
-#else
-	found = TRUE;
-#endif
-
-	return found;
-}
-#endif // __AUI_USE_DIRECTX__
-
 void main_InitializeLogs(void)
 {
 	time_t		ltime;
@@ -1460,19 +1406,6 @@ int CivMain
 #else	// __GNUC__
 int WINAPI CivMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 {
-#if defined(__AUI_USE_DIRECTX__)
-
-	HWND hwnd = FindWindow (gszMainWindowClass, gszMainWindowName);
-	if (hwnd) {
-
-		if (IsIconic(hwnd)) {
-			ShowWindow(hwnd, SW_RESTORE);
-		}
-		SetForegroundWindow (hwnd);
-
-		return FALSE;
-	}
-#endif
 #endif // __GNUC__
 
 #if defined(WIN32)

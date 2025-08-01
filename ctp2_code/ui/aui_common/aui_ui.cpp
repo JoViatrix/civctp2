@@ -226,35 +226,6 @@ AUI_ERRCODE aui_UI::InitCommon(
 	else m_ldl = NULL;
 
 	m_dxver = 0;
-#ifdef __AUI_USE_DIRECTX__
-#if defined(_X86_)
-	HANDLE dll = LoadLibrary( "dll\\util\\dxver" );
-	if ( dll )
-	{
-		typedef BOOL (WINAPI *FuncType)( DWORD *pVersion );
-		FuncType GetDirectXVersion =
-			(FuncType)GetProcAddress( (HINSTANCE)dll, "MicrosoftDirectXInstalled" );
-		Assert( GetDirectXVersion != NULL );
-		if ( !GetDirectXVersion )
-		{
-			FreeLibrary( (HINSTANCE)dll );
-			return AUI_ERRCODE_HACK;
-		}
-
-		switch ( GetDirectXVersion( &m_dxver ) )
-		{
-			case 0: break;
-			case DX_SOFTWARE: break;
-			case DX_HARDWARE: break;
-			case DX_NOINFO: break;
-		}
-
-		FreeLibrary( (HINSTANCE)dll );
-	}
-#else
-	m_dxver = 0x500;
-#endif
-#endif
 
 	return AUI_ERRCODE_OK;
 }
@@ -335,7 +306,7 @@ void aui_UI::RegisterObject( aui_MemMap *memmap )
 	if ( memmap ) m_memmap = memmap;
 }
 
-void aui_UI::RegisterObject( aui_Mouse *mouse )
+void aui_UI::RegisterObject( aui_Mouse *mouse ) 
 {
 	Assert( mouse != NULL );
 	if ( mouse ) (m_mouse = mouse)->SetClip( 0, 0, m_width, m_height );

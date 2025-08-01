@@ -701,9 +701,6 @@ GreatLibrary::GreatLibrary(sint32 theMode)
 	m_techTree               (NULL),
 	m_techRequirementsText   (NULL),
 	m_techVariablesText      (NULL),
-#ifdef __AUI_USE_DIRECTX__
-	m_techMovie              (NULL),
-#endif // __AUI_USE_DIRECTX__
 	m_techStillShot          (NULL),
 	m_string                 (NULL),
 	m_buttonString           (LIB_STRING_INDEX),

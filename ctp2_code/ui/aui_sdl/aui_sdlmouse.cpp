@@ -157,10 +157,13 @@ void aui_SDLMouse::GetInput(SDL_Event* event)
 					break;
 				case SDL_BUTTON_MIDDLE:
 					m_data.mbutton = (event->button.down);
+					break;
 				case SDL_BUTTON_X1:
 					m_data.tbutton = (event->button.down);
+					break;
 				case SDL_BUTTON_X2:
 					m_data.ubutton = (event->button.down);
+					break;
 				default:
 					break;
 			}

@@ -782,14 +782,13 @@ void SoundManager::StartMusic(const sint32 &InTrackNum)
 
 	m_curTrack = trackNum;
 
-	sprintf(buf, "music/Track%02d.ogg", m_curTrack+1);
+	snprintf(buf, sizeof(buf), "music/Track%02d.ogg", m_curTrack+1);
 	// clean previous if there
 	CleanupRedbook();
 	m_oggTrack = MIX_LoadAudio(m_mixer, CI_FixName(buf), false);
 	if(m_oggTrack) {
 		MIX_SetTrackAudio(m_musicTrack, m_oggTrack);
 		MIX_PlayTrack(m_musicTrack, g_noLoopProps);
-		// Mix_PlayMusic(m_oggTrack, 1);
 	}
 	else
 		printf("Error, music track %s not found\n", buf);
