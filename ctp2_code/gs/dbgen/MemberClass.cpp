@@ -24,21 +24,21 @@
 //
 // Modifications from the original Activision code:
 //
-// - Members of substructs can now have default values, added by Martin Gühmann.
+// - Members of substructs can now have default values, added by Martin Gï¿½hmann.
 // - Modified AddBitPair function to allow bit pairs to have default values
 //   so that when two records are merged, only the bit is merged
-//   in that is set. - Sep. 28th 2004 Martin Gühmann
-// - Added serilization method export. (Aug 24th 2005 Martin Gühmann)
+//   in that is set. - Sep. 28th 2004 Martin Gï¿½hmann
+// - Added serilization method export. (Aug 24th 2005 Martin Gï¿½hmann)
 // - Output files only have spaces instead of tabs as indent and indention
-//   was fixed. (Aug 25th 2005 Martin Gühmann)
-// - Added alias names. (Aug 26th 2005 Martin Gühmann)
+//   was fixed. (Aug 25th 2005 Martin Gï¿½hmann)
+// - Added alias names. (Aug 26th 2005 Martin Gï¿½hmann)
 // - Costum structs can now include other custom structs, given both are
-//   direct members of the record class (Support for DiffDB). (Sep 15th 2005 Martin Gühmann)
-// - Parser for struct ADVANCE_CHANCES of DiffDB.txt can now be generated. (Jan 3rd 2006 Martin Gühmann)
-// - Fixed subsubstruct generation so that it can be used in DiffDB.txt. (April 29th 2006 Martin Gühmann)
+//   direct members of the record class (Support for DiffDB). (Sep 15th 2005 Martin Gï¿½hmann)
+// - Parser for struct ADVANCE_CHANCES of DiffDB.txt can now be generated. (Jan 3rd 2006 Martin Gï¿½hmann)
+// - Fixed subsubstruct generation so that it can be used in DiffDB.txt. (April 29th 2006 Martin Gï¿½hmann)
 // - Added ParseNum so that a certain number of entries can be parsed if
-//   braces are missing so that the old pollution database can be supported. (July 15th 2006 Martin Gühmann)
-// - Added map.txt support. (27-Mar-2007 Martin Gühmann)
+//   braces are missing so that the old pollution database can be supported. (July 15th 2006 Martin Gï¿½hmann)
+// - Added map.txt support. (27-Mar-2007 Martin Gï¿½hmann)
 //
 //----------------------------------------------------------------------------
 
@@ -80,7 +80,7 @@ void MemberClass::AddDatum(DATUM_TYPE type, struct namelist *nameInfo,
 	dat->m_maxSize = maxSize;
 	dat->m_subType = subType;
 
-	//Added by Martin Gühmann to allow struct members to have default values
+	//Added by Martin Gï¿½hmann to allow struct members to have default values
 	if(!(nameInfo->flags & k_NAMEVALUE_HAS_VALUE)
 	&&   maxSize <= 0
 	){
@@ -118,13 +118,13 @@ void MemberClass::AddGroupedBits(char *name, struct namelist *list)
 	Assert("Group Bits in Member classes not yet supported" == 0);
 }
 
-//Added by Martin Gühmann
+//Added by Martin Gï¿½hmann
 void MemberClass::AddBitPair(struct namelist *nameInfo, sint32 minSize, sint32 maxSize, struct bitpairtype *pairtype)
 {
 	Datum *dat = new Datum(nameInfo->name, DATUM_BIT_PAIR);
 	dat->m_minSize = minSize;
 	dat->m_maxSize = maxSize;
-	// Added by Martin Gühmann for adding default values
+	// Added by Martin Gï¿½hmann for adding default values
 	if((nameInfo->flags & k_NAMEVALUE_HAS_VALUE)
 	|| (maxSize > 0)
 	){
@@ -159,7 +159,7 @@ void MemberClass::ExportHeader(FILE *outfile)
 void MemberClass::ExportBits(FILE *outfile)
 {
 	sint32 bit = 0;
-	char nicename[k_MAX_RECORD_NAME];
+	char nicename[k_MAX_RECORD_NAME + sizeof("k____Bit") - 1];
 
 	PointerList<Datum>::Walker walk(&m_datumList);
 	while(walk.IsValid()) {
@@ -168,8 +168,8 @@ void MemberClass::ExportBits(FILE *outfile)
 			if(!(bit % 32)) {
 				fprintf(outfile, "//\n// m_flags%d: %s\n", bit / 32, m_name);
 			}
-			sprintf(nicename, "k_%s_%s_Bit", m_name, dat->m_name);
-			fprintf(outfile, "#define %-40s 0x%08lx\n", nicename, 1 << (bit % 32));
+			snprintf(nicename, sizeof(nicename), "k_%s_%s_Bit", m_name, dat->m_name);
+			fprintf(outfile, "#define %-40s 0x%08lx\n", nicename, 1UL << (bit % 32));
 			bit++;
 		}
 		walk.Next();
@@ -183,8 +183,8 @@ void MemberClass::ExportBits(FILE *outfile)
 			fprintf(outfile, "//\n// m_%s bit group\n", dat->m_name);
 			struct namelist *node = dat->m_groupList;
 			while(node) {
-				sprintf(nicename, "k_%s_%s_%s_Bit", m_name, dat->m_name, node->name);
-				fprintf(outfile, "#define %-40s 0x%08lx\n", nicename, 1 << bit);
+				snprintf(nicename, sizeof(nicename), "k_%s_%s_%s_Bit", m_name, dat->m_name, node->name);
+				fprintf(outfile, "#define %-40s 0x%08lx\n", nicename, 1UL << bit);
 				bit++;
 				Assert(bit <= 32);
 				node = node->next;
@@ -409,7 +409,7 @@ void MemberClass::ExportInitialization(FILE *outfile, char *recordName)
 
 void MemberClass::ExportParser(FILE *outfile, char *recordName)
 {
-	char nicename[k_MAX_STRING];
+	char nicename[k_MAX_STRING + sizeof("k_Token___") - 1];
 	sint32 numTokens = 0;
 
 	// TODO add aka and default names.
@@ -431,7 +431,7 @@ void MemberClass::ExportParser(FILE *outfile, char *recordName)
 
 	for (walk.SetList(&m_datumList); walk.IsValid(); walk.Next())
 	{
-		sprintf(nicename, "k_Token_%s_%s_%s", recordName, m_name, walk.GetObj()->m_name);
+		snprintf(nicename, sizeof(nicename), "k_Token_%s_%s_%s", recordName, m_name, walk.GetObj()->m_name);
 		fprintf(outfile, "#define %-40s ((k_Token_Custom_Base) + %d)\n", nicename, numTokens);
 		numTokens++;
 	}
@@ -439,7 +439,7 @@ void MemberClass::ExportParser(FILE *outfile, char *recordName)
 	{
 		Datum *dat = walk.GetObj();
 		if(dat->m_akaName){
-			sprintf(nicename, "k_Token_%s_%s_%s", recordName, m_name, dat->m_akaName);
+			snprintf(nicename, sizeof(nicename), "k_Token_%s_%s_%s", recordName, m_name, dat->m_akaName);
 			fprintf(outfile, "#define %-40s ((k_Token_Custom_Base) + %d)\n", nicename, numTokens);
 			numTokens++;
 		}

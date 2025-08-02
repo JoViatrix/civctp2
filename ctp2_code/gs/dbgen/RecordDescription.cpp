@@ -45,33 +45,33 @@
 //     addition to the standard parsed record syntax.
 //
 // - Added return type void to Init function to make .NET quiet about the
-//   missing return type, by Martin Gühmann.
+//   missing return type, by Martin Gï¿½hmann.
 // - Modified AddBitPair function to allow bit pairs to have default values
 //   so that when two records are merged, only the bit is merged
-//   in that is set. - Sep. 28th 2004 Martin Gühmann
-// - Added serilization method export. (Aug 24th 2005 Martin Gühmann)
+//   in that is set. - Sep. 28th 2004 Martin Gï¿½hmann
+// - Added serilization method export. (Aug 24th 2005 Martin Gï¿½hmann)
 // - Output files only have spaces instead of tabs as indent and indetion
-//   was fixed. (Aug 25th 2005 Martin Gühmann)
+//   was fixed. (Aug 25th 2005 Martin Gï¿½hmann)
 // - Added alias names and the possibility to have default values from
-//   other entries. (Aug 26th 2005 Martin Gühmann)
-// - Added accessors for slic database array access. (Sep 16th 2005 Martin Gühman)
-// - Made float arrays possible. (Sep 16th 2005 Martin Gühman)
-// - Made value of int databases accessable. (Sep 16th 2005 Martin Gühman)
+//   other entries. (Aug 26th 2005 Martin Gï¿½hmann)
+// - Added accessors for slic database array access. (Sep 16th 2005 Martin Gï¿½hman)
+// - Made float arrays possible. (Sep 16th 2005 Martin Gï¿½hman)
+// - Made value of int databases accessable. (Sep 16th 2005 Martin Gï¿½hman)
 // - If database records have no name a default name is generated. e.g.
-//   DIFFICULTY_5 for the sixth entry in the DifficultyDB. (Jan 3rd 2006 Martin Gühman)
+//   DIFFICULTY_5 for the sixth entry in the DifficultyDB. (Jan 3rd 2006 Martin Gï¿½hman)
 // - Added ParseNum so that a certain number of entries can be parsed if
-//   braces are missing so that the old pollution database can be supported. (July 15th 2006 Martin Gühmann)
-// - Added default tokens for database records. (July 15th 2006 Martin Gühmann)
-// - Added map.txt support. (27-Mar-2007 Martin Gühmann)
-// - Added Const.txt support. (29-Jul-2007 Martin Gühmann)
+//   braces are missing so that the old pollution database can be supported. (July 15th 2006 Martin Gï¿½hmann)
+// - Added default tokens for database records. (July 15th 2006 Martin Gï¿½hmann)
+// - Added map.txt support. (27-Mar-2007 Martin Gï¿½hmann)
+// - Added Const.txt support. (29-Jul-2007 Martin Gï¿½hmann)
 // - Added support for default values taken from other databases like the
-//   Const database. (9-Dec-2007 Martin Gühmann)
+//   Const database. (9-Dec-2007 Martin Gï¿½hmann)
 //
 //----------------------------------------------------------------------------
 #include "ctp2_config.h"
 #include "ctp2_inttypes.h"
 
-#pragma warning(disable:4786)   // (Level ?)   identifier length over 255 (with templates)
+// #pragma warning(disable:4786)   // (Level ?)   identifier length over 255 (with templates)
 
 #include <stdio.h>
 #include <string.h>
@@ -424,7 +424,7 @@ void RecordDescription::EndMemberClass(char const * name)
 void RecordDescription::ExportBits(FILE *outfile)
 {
 	sint32 bit = 0;
-	char nicename[k_MAX_RECORD_NAME];
+	char nicename[k_MAX_RECORD_NAME + sizeof("k____Bit") - 1];
 
 	PointerList<Datum>::Walker walk(&m_datumList);
 
@@ -435,8 +435,8 @@ void RecordDescription::ExportBits(FILE *outfile)
 			if(!(bit % 32)) {
 				fprintf(outfile, "//\n// m_flags%d: %s\n", bit / 32, m_name);
 			}
-			sprintf(nicename, "k_%s_%s_Bit", m_name, dat->m_name);
-			fprintf(outfile, "#define %-40s 0x%08lx\n", nicename, 1 << (bit % 32));
+			snprintf(nicename, sizeof(nicename), "k_%s_%s_Bit", m_name, dat->m_name);
+			fprintf(outfile, "#define %-40s 0x%08lx\n", nicename, 1UL << (bit % 32));
 			bit++;
 		}
 	}
@@ -457,8 +457,8 @@ void RecordDescription::ExportBits(FILE *outfile)
 			    node = node->next
 			)
 			{
-				sprintf(nicename, "k_%s_%s_%s_Bit", m_name, dat->m_name, node->name);
-				fprintf(outfile, "#define %-40s 0x%08lx\n", nicename, 1 << bit);
+				snprintf(nicename, sizeof(nicename), "k_%s_%s_%s_Bit", m_name, dat->m_name, node->name);
+				fprintf(outfile, "#define %-40s 0x%08lx\n", nicename, 1UL << bit);
 				bit++;
 				Assert(bit <= 32);
 			}
@@ -788,7 +788,7 @@ void RecordDescription::ExportMerger(FILE *outfile)
 
 void RecordDescription::ExportParser(FILE *outfile)
 {
-	char nicename[k_MAX_STRING];
+	char nicename[k_MAX_STRING + sizeof("k_Token___Value") - 1];
 
 	fprintf(outfile, "const char *g_%s_Tokens[] =\n", m_name);
 	fprintf(outfile, "{\n");
@@ -871,12 +871,12 @@ void RecordDescription::ExportParser(FILE *outfile)
 	for (walk.SetList(&m_datumList); walk.IsValid(); walk.Next())
 	{
 		Datum *dat = walk.GetObj();
-		sprintf(nicename, "k_Token_%s_%s", m_name, dat->m_name);
+		snprintf(nicename, sizeof(nicename), "k_Token_%s_%s", m_name, dat->m_name);
 		fprintf(outfile, "#define %-40s ((k_Token_Custom_Base) + %d)\n", nicename, numTokens);
 		numTokens++;
 
 		if(dat->m_type == DATUM_BIT_PAIR) {
-			sprintf(nicename, "k_Token_%s_%s_Value", m_name, dat->m_name);
+			snprintf(nicename, sizeof(nicename), "k_Token_%s_%s_Value", m_name, dat->m_name);
 			fprintf(outfile, "#define %-40s ((k_Token_Custom_Base) + %d)\n", nicename, numTokens);
 			numTokens++;
 		}
@@ -886,13 +886,13 @@ void RecordDescription::ExportParser(FILE *outfile)
 	{
 		Datum *dat = walk.GetObj();
 		if(dat->m_akaName){
-			sprintf(nicename, "k_Token_%s_%s", m_name, dat->m_akaName);
+			snprintf(nicename, sizeof(nicename), "k_Token_%s_%s", m_name, dat->m_akaName);
 			fprintf(outfile, "#define %-40s ((k_Token_Custom_Base) + %d)\n", nicename, numTokens);
 			numTokens++;
 		}
 	}
 
-	sprintf(nicename, "k_Token_%s_Max", m_name);
+	snprintf(nicename, sizeof(nicename), "k_Token_%s_Max", m_name);
 	fprintf(outfile, "#define %-40s ((k_Token_Custom_Base) + %d)\n\n\n", nicename, numTokens);
 
 	fprintf(outfile, "static BitArray s_ParsedTokens(%d);\n", numTokens);
@@ -1516,7 +1516,7 @@ void RecordDescription::ExportStringUpdater(FILE *outfile)
 		Datum * dat = walk.GetObj();
 
 		if(dat->m_type == DATUM_STRINGID
-		|| dat->m_type == DATUM_BIT_PAIR && dat->m_bitPairDatum->m_type == DATUM_STRINGID
+		|| (dat->m_type == DATUM_BIT_PAIR && dat->m_bitPairDatum->m_type == DATUM_STRINGID)
 		){
 			dat->StringUpdater(outfile);
 		}

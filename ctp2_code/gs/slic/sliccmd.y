@@ -28,7 +28,7 @@
 // Modifications from the original Activision code:
 //
 // - Exponetiation operator '**' added.
-// - Added database array access. (Sep 16th 2005 Martin Gühmann)
+// - Added database array access. (Sep 16th 2005 Martin Gï¿½hmann)
 //
 //----------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@
 #include <math.h>
 
 /* Avoid silly warnings */
-#pragma warning( disable : 4013 )
+// #pragma warning( disable : 4013 )
 #define lint
 
 void yyerror(const char* err);

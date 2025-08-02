@@ -26,18 +26,18 @@
 //
 // - Modified ExportBitPairInitialization function to allow bit pairs to
 //   have default values so that when two records are merged, only the bit
-//   is merged in that is set. - Sep. 28th 2004 Martin Gühmann
+//   is merged in that is set. - Sep. 28th 2004 Martin Gï¿½hmann
 // - Updated ExportBitPairAccessorProto function so that the default
 //   values of bits can be accesses if these bits have default values.
-// - Added serilization method export. (Aug 24th 2005 Martin Gühmann)
+// - Added serilization method export. (Aug 24th 2005 Martin Gï¿½hmann)
 // - Output files only have spaces instead of tabs as indent and indetion
-//   was fixed. (Aug 25th 2005 Martin Gühmann)
+//   was fixed. (Aug 25th 2005 Martin Gï¿½hmann)
 // - Added alias names and the possibility to have default values from
-//   other entries. (Aug 26th 2005 Martin Gühmann)
+//   other entries. (Aug 26th 2005 Martin Gï¿½hmann)
 // - Modernised destructor code.
-// - Fixed operator equal generation for non-integer arrays. (Jan 3rd 2006 Martin Gühmann)
+// - Fixed operator equal generation for non-integer arrays. (Jan 3rd 2006 Martin Gï¿½hmann)
 // - Added support for default values taken from other databases like the
-//   Const database. (9-Dec-2007 Martin Gühmann)
+//   Const database. (9-Dec-2007 Martin Gï¿½hmann)
 //
 //----------------------------------------------------------------------------
 
@@ -989,6 +989,9 @@ void Datum::ExportOperatorAssignment(FILE *outfile)
 			fprintf(outfile, "%s}\n", ind);
 			fprintf(outfile, "%sm_num%s = rval.m_num%s;\n\n", ind, m_name, m_name);
 			break;
+		
+		default:
+			break;
 		}
 	}
 	else if ( m_maxSize > 0 )
@@ -1041,6 +1044,9 @@ void Datum::ExportOperatorAssignment(FILE *outfile)
 			fprintf(outfile, "%s}\n\n", ind);
 
 			break;
+		
+		default:
+			break;
 		}
 	}
 	else if ( m_type ==  DATUM_BIT_PAIR )
@@ -1077,6 +1083,9 @@ void Datum::ExportOperatorAssignment(FILE *outfile)
 			        ind, m_bitPairDatum->m_name, m_bitPairDatum->m_name
 			       );
 			fprintf(outfile, "%s}\n\n", ind);
+			break;
+
+		default:
 			break;
 		}
 	}
@@ -1196,6 +1205,9 @@ void Datum::StringUpdater(FILE  *outfile)
 				fprintf(outfile, "    {\n");
 				fprintf(outfile, "        g_theStringDB->GetStringID(m_%sIDText[index], m_%s[index]);\n", m_name, m_name);
 				fprintf(outfile, "    }\n");
+				break;
+			
+			default:
 				break;
 		}
 	}
@@ -1333,6 +1345,9 @@ void Datum::ExportMerge(FILE *outfile, char *recordName)
 				       );
 				fprintf(outfile, "            }\n");
 				fprintf(outfile, "    }\n");
+
+			default:
+				break;
 		}
 	}
 	else if (m_type == DATUM_BIT_PAIR)
@@ -1383,6 +1398,9 @@ void Datum::ExportMerge(FILE *outfile, char *recordName)
 				fprintf(outfile, "        strcpy(m_%s, rval.m_%s);\n",
 				        m_bitPairDatum->m_name, m_bitPairDatum->m_name);
 				fprintf(outfile, "    }\n\n");
+				break;
+
+			default:
 				break;
 		}
 	}

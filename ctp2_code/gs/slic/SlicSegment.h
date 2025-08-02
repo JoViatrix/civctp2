@@ -120,7 +120,7 @@ public:
 	BOOL TestLastShown(sint32 player, sint32 turn);
 	BOOL HasBeenShown(sint32 player) {
 	    Assert(m_lastShown);
-	    if (!m_lastShown) return FALSE;
+	    // if (!m_lastShown) return FALSE;
 	    return(m_lastShown[player] != 0);
 	}
 
