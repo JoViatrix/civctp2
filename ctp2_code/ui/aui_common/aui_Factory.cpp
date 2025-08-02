@@ -51,18 +51,10 @@ aui_Factory::new_Surface(AUI_ERRCODE &retval,
                          const BOOL &takeOwnership
                         )
 {
-#if defined(__AUI_USE_SDL__)
 	aui_SDLSurface *surface = 0;
 
 	surface = new aui_SDLSurface(&retval, width, height, g_c3ui->BitsPerPixel(), g_c3ui->DD(),
 	                             isPrimary, useVideoMemory, takeOwnership);
-#elif defined(__AUI_USE_DIRECTX__)
-	aui_DirectSurface *surface = 0;
-
-	surface = new aui_DirectSurface(&retval, width, height, g_c3ui->BitsPerPixel(), g_c3ui->DD(),
-	             (LPDIRECTDRAWSURFACE) data,
-	              isPrimary, useVideoMemory);
-#endif
 	Assert( AUI_NEWOK(surface, retval) );
 
 	return surface;
@@ -74,11 +66,7 @@ aui_Factory::new_Mouse(AUI_ERRCODE  &retval,
                        const BOOL   &useExclusiveMode
                       )
 {
-#if defined(__AUI_USE_SDL__)
 	aui_SDLMouse *mouse = new aui_SDLMouse(&retval, ldlBlock, useExclusiveMode);
-#elif defined(__AUI_USE_DIRECTX__)
-	aui_DirectMouse *mouse = new aui_DirectMouse(&retval, ldlBlock, useExclusiveMode);
-#endif
 	Assert( AUI_NEWOK(mouse, retval) );
 
 	return mouse;
