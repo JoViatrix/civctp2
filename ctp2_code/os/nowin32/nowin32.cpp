@@ -136,9 +136,9 @@ void _splitpath( const char *path,
   // fprintf(stderr, "%s L%d: %s %s %s %s!\n", __FILE__, __LINE__, drive, dir, fname, ext);
 }
 
-uint32 GetTickCount()
+uint64 GetTickCount()
 {
-	return SDL_GetTicks();
+	return SDL_GetTicks(); // in ms!
 }
 
 sint32 MessageBox(HWND parent, const CHAR* msg, const CHAR* title, sint32 flags)

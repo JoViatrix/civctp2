@@ -241,7 +241,7 @@ typedef struct hwnd_t* HWND;
 char* _fullpath(char*, const char*, size_t);
 void _splitpath(const char*,char*,char*,char*,char*);
 void CopyRect(RECT *dest, RECT *src);
-uint32 GetTickCount();
+uint64 GetTickCount();
 uint8 GetRValue(COLORREF c);
 uint8 GetGValue(COLORREF c);
 uint8 GetBValue(COLORREF c);

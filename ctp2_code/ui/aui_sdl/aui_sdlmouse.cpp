@@ -29,6 +29,11 @@ uint32 HandleMouseAnimation(uint32 interval, void *param)
 	return interval;
 }
 
+inline uint64 ConvertNsToMs(uint64 timestamp)
+{
+	return timestamp / 1000000;
+}
+
 aui_SDLMouse::aui_SDLMouse(
     AUI_ERRCODE *retval,
     const MBCHAR *ldlBlock,
@@ -113,7 +118,7 @@ void aui_SDLMouse::GetInput(SDL_Event* event)
 	{
 		case SDL_EVENT_MOUSE_MOTION:
 		{
-			m_data.time = event->motion.timestamp;
+			m_data.time = ConvertNsToMs(event->motion.timestamp); // timestamp is in ns and must be converted to ms
 			m_data.position.x = event->motion.x;
 			m_data.position.y = event->motion.y;
 			m_data.lbutton = ((event->motion.state & SDL_BUTTON_LMASK) != 0);
@@ -127,7 +132,7 @@ void aui_SDLMouse::GetInput(SDL_Event* event)
 		case SDL_EVENT_MOUSE_BUTTON_DOWN:
 		case SDL_EVENT_MOUSE_BUTTON_UP:
 		{
-			m_data.time = event->button.timestamp;
+			m_data.time = ConvertNsToMs(event->button.timestamp); // timestamp is in ns and must be converted to ms
 			m_data.position.x = event->button.x;
 			m_data.position.y = event->button.y;
 
