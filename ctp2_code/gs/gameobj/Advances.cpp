@@ -711,7 +711,8 @@ void Advances::ResetCanResearch(sint32 justGot)
 				{
 					sint32 which = g_rand->Next(p);
 					// Do not remove advance that is currently being researched
-					while (possible[which] == m_researching) {
+					// while (possible[which] == m_researching) {
+					while (static_cast<int64_t>(possible[which]) == static_cast<int64_t>(m_researching)) {
 						which = g_rand->Next(p);
 					}
 					m_canResearch[possible[which]] = 0;

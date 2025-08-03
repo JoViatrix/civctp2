@@ -555,8 +555,8 @@ sint32 Token::Next()
 //#warning "TODO" // Not c++ standart, so VS does not have this
 #if 1//0
 		
-		if(g_civPaths->GetCurScenarioPath()     == NULL        // Load only defaults if this isn't a scenario
-		&& g_civPaths->GetCurScenarioPackPath() == NULL
+		if((g_civPaths->GetCurScenarioPath()     == NULL        // Load only defaults if this isn't a scenario
+		&& g_civPaths->GetCurScenarioPackPath() == NULL)
 		|| GetType() == TOKEN_SCENARIO_DO_NOT_IMPORT_DEFAULTS  // But not if you have this token
 		){
 			g_load_defaults = false;

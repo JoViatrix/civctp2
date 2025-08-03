@@ -156,11 +156,7 @@ ProfileDB::ProfileDB()
     m_requireCD                         (FALSE),
     m_protected                         (FALSE),
 	m_tryWindowsResolution              (TRUE),
-#ifdef __AUI_USE_SDL__
 	m_useDirectXBlitter                 (FALSE),
-#else
-	m_useDirectXBlitter                 (TRUE),
-#endif
     m_screenResWidth                    (640),
     m_screenResHeight                   (480),
     m_zoomedCombatAlways                (FALSE),
@@ -201,6 +197,7 @@ ProfileDB::ProfileDB()
     m_moveHoldTime                      (500),
     m_battleSpeed                       (SLIDER_MIDDLE),
     m_showEnemyHealth                   (TRUE),
+	m_debugai                           (FALSE),
     m_scrollDelay                       (0),
     m_autoRenameCities                  (FALSE),
     m_autoOpenCityWindow                (TRUE),
@@ -232,7 +229,6 @@ ProfileDB::ProfileDB()
     m_showOrderUnion                    (FALSE),
     m_recentAtTop                       (FALSE),
     m_cityClick                         (FALSE),
-    m_dontSave                          (FALSE),
     m_endTurnWithEmptyBuildQueues       (FALSE),
     m_runInBackground                   (FALSE),
     m_autoExpireTreatyTurn              (k_EXPIRATION_NEVER),
@@ -252,8 +248,7 @@ ProfileDB::ProfileDB()
     m_GoldPerCity                       (FALSE),
     m_AIMilitiaUnit                     (FALSE),
     m_OneCityChallenge                  (FALSE),
-    m_NRG                               (FALSE),
-    m_debugai                           (FALSE),
+	m_NRG                               (FALSE),
     m_ruin                              (FALSE),
     m_NoCityLimit                       (FALSE),
     m_DebugCityAstar                    (FALSE),
@@ -267,7 +262,8 @@ ProfileDB::ProfileDB()
     m_sleepingUnitsBoard                (FALSE),
     // Add above this line new profile options
     m_vars                              (new PointerList<ProfileVar>),
-    m_loadedFromTutorial                (FALSE)
+    m_loadedFromTutorial                (FALSE),
+	m_dontSave                          (FALSE)
 {
 	for (size_t player = 0; player < k_MAX_PLAYERS; ++player)
 	{
@@ -475,12 +471,8 @@ ProfileDB::ProfileDB()
 	Var("SPEndingAge"                , PV_NUM   , &m_spEndingAge                , NULL, false);
 	Var("ShowCityProduction"         , PV_BOOL  , &m_showCityProduction         , NULL, false);
 
-#ifdef __AUI_USE_SDL__
 	// Only show with SDL, otherwise unknown how to do window mode
 	Var("WindowedMode"               , PV_BOOL  , &m_windowedMode               , NULL);
-#else
-	Var("WindowedMode"               , PV_BOOL  , &m_windowedMode               , NULL, false);
-#endif
 
 	Var("SleepingUnitsBoard"          , PV_BOOL  , &m_sleepingUnitsBoard         , NULL);
 }
@@ -663,7 +655,7 @@ void ProfileDB::SetTutorialAdvice( BOOL val )
 	m_tutorialAdvice = val;
 }
 
-void ProfileDB::SetDiplmacyLog(BOOL b)
+void ProfileDB::SetDiplmacyLog(bool b)
 {
 	if (b == m_is_diplomacy_log_on)
 	{
@@ -855,10 +847,10 @@ void ProfileDB::SetDifficulty(uint32 x)
 	}
 }
 
-void ProfileDB::Var(char *name, PROF_VAR_TYPE type, sint32 *numValue,
+void ProfileDB::Var(const char *name, PROF_VAR_TYPE type, sint32 *numValue,
                     char *stringValue, bool visible)
 {
-	m_vars->AddTail(new ProfileVar(name, type, numValue, stringValue, visible));
+	m_vars->AddTail(new ProfileVar(const_cast<char*>(name), type, numValue, stringValue, visible));
 }
 
 void ProfileDB::Save()

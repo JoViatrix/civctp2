@@ -25,21 +25,21 @@
 //
 // Modifications from the original Activision code:
 //
-// - Added slic database access by Martin Gühmann
-// - Added a way to find out the size of a slic database by Martin Gühmann
+// - Added slic database access by Martin Gï¿½hmann
+// - Added a way to find out the size of a slic database by Martin Gï¿½hmann
 // - slicif_cleanup() added.
-// - Fixed slic database access after a reload by Martin Gühmann.
+// - Fixed slic database access after a reload by Martin Gï¿½hmann.
 // - Types corrected.
 // - Added debugging code for '**' operator
 // - Replaced slicif_is_sym by slicif_is_name function. This function is
 //   modelled slicif_find_db_index but without error message if this
-//   function fails to retrieve the database index. - Feb. 24th 2005 Martin Gühmann
+//   function fails to retrieve the database index. - Feb. 24th 2005 Martin Gï¿½hmann
 // - Added debugging code for bitwise operator
 // - Prevented crash with invalid Slic input.
-// - Initialized local variables. (Sep 9th 2005 Martin Gühmann)
-// - Added database array access. (Sep 16th 2005 Martin Gühmann)
+// - Initialized local variables. (Sep 9th 2005 Martin Gï¿½hmann)
+// - Added database array access. (Sep 16th 2005 Martin Gï¿½hmann)
 // - Slic file paths are even saved if slic debugging is off, so that there is
-//   no problem if slic debugging is set on without reloading slic. (24-Feb-2008 Martin Gühmann)
+//   no problem if slic debugging is set on without reloading slic. (24-Feb-2008 Martin Gï¿½hmann)
 //
 //----------------------------------------------------------------------------
 
@@ -385,7 +385,7 @@ void slicif_add_op(SOP op, ...)
 	char *sptr;
 	char internalName[k_MAX_FUNCTION_NAME];
 
-	//Added by Martin Gühmann for database access
+	//Added by Martin Gï¿½hmann for database access
 	SlicDBInterface *conduit;
 	char *dbName;
 //	string dbName;
@@ -832,7 +832,7 @@ void slicif_add_op(SOP op, ...)
 			*((int *)s_code_ptr) = symval->GetIndex();
 			s_code_ptr += sizeof(int);
 			break;
-//Added by Martin Gühmann for database support
+//Added by Martin Gï¿½hmann for database support
 		case SOP_DBNAME:
 		{
 			conduit = va_arg(vl, SlicDBInterface *);
@@ -1041,7 +1041,7 @@ void slicif_add_op(SOP op, ...)
 		}
 		case SOP_DBSIZE:
 		{
-			//Added by Martin Gühmann to figure out via
+			//Added by Martin Gï¿½hmann to figure out via
 			//slic how many records the database contains
 			conduit = va_arg(vl, SlicDBInterface *);
 			Assert(conduit);
@@ -1157,7 +1157,7 @@ void slicif_dump_code(unsigned char* code, size_t codeSize)
 	double dval;
 	int ival, ival2;
 	SlicNamedSymbol *symval;
-	//Added by Martin Gühmann for database access
+	//Added by Martin Gï¿½hmann for database access
 //	SlicDBInterface *conduit;
 	char* name;
 	const char* dbName;
@@ -1443,7 +1443,7 @@ void slicif_dump_code(unsigned char* code, size_t codeSize)
 					fprintf(debuglog, "asize %s(%d)\n", symval->GetName(), ival);
 				}
 				break;
-//Added by Martin Gühmann for database support
+//Added by Martin Gï¿½hmann for database support
 			case SOP_DBNAME:
 			{
 				//Get the database name:
@@ -1639,7 +1639,7 @@ void slicif_dump_code(unsigned char* code, size_t codeSize)
 			}
 			case SOP_DBSIZE:
 			{
-				//Added by Martin Gühmann to figure out via
+				//Added by Martin Gï¿½hmann to figure out via
 				//slic how many records the database contains
 				//Get the database name:
 				int i;
@@ -1939,7 +1939,7 @@ void slicif_check_event_exists(char *name)
 char *slicif_create_name(char *base)
 {
 	char *name = (char *)malloc(strlen(base) + 10);
-	sprintf(name, "%s!%08lx", base, s_temp_name_counter++);
+	sprintf(name, "%s!%08lx", base, (unsigned long)s_temp_name_counter++);
 	return name;
 }
 
@@ -2044,7 +2044,7 @@ void slicif_start_event(char *name)
 	slicif_add_op(SOP_SARGS);
 }
 
-void slicif_check_arg_symbol(SLIC_SYM type, char *typeName)
+void slicif_check_arg_symbol(SLIC_SYM type, const char *typeName)
 {
 	char errbuf[1024];
 	SLIC_SYM symType;

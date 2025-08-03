@@ -38,10 +38,10 @@
 //   - INT GetProjectedScience(player) / INT GetProjectedScience(city)
 //   - INT GetStopResearchingAdvance(player,foreigner)
 //   - INT GetMostAtRiskCity(player, foreigner, &cityvar)
-//   These functions compile but still need to be tested. (April 22nd 2006 Martin Gühmann)
+//   These functions compile but still need to be tested. (April 22nd 2006 Martin Gï¿½hmann)
 // - Provided a default tone to ParseNewProposalSlicArgs
-//   if no tone is provided. (11-Oct-2007 Martin Gühmann)
-// - Fixed GetPersonalityType and made it compatibe with Diplomod. (22-Oct-2007 Martin Gühmann)
+//   if no tone is provided. (11-Oct-2007 Martin Gï¿½hmann)
+// - Fixed GetPersonalityType and made it compatibe with Diplomod. (22-Oct-2007 Martin Gï¿½hmann)
 //
 //----------------------------------------------------------------------------
 
@@ -1382,10 +1382,10 @@ SFN_ERROR Slic_GetLastNewProposalType::Call(SlicArgList *args)
 		return SFN_ERROR_TYPE_ARGS;
 
     if(type<0 || type >1)
-        return SFN_ERROR_OUT_OF_RANGE;
+		return SFN_ERROR_OUT_OF_RANGE;
 
 	if(type==0){
-        m_result.m_int =Diplomat::GetDiplomat(player).GetMyLastNewProposal(foreigner).detail.first_type;
+		m_result.m_int =Diplomat::GetDiplomat(player).GetMyLastNewProposal(foreigner).detail.first_type;
     }
 	else {
         m_result.m_int =Diplomat::GetDiplomat(player).GetMyLastNewProposal(foreigner).detail.second_type;

@@ -995,8 +995,8 @@ void GreatLibrary::Remove(void)
 
 sint32 GreatLibrary::SetLibrary( sint32 theMode, DATABASE theDatabase, bool add_to_history )
 {
-    if (theMode < 0)
-        return 0;
+	if (theMode < 0)
+		return 0;
 
 	m_selectedIndex = theMode;
 

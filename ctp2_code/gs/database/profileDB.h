@@ -443,7 +443,7 @@ public:
 
     BOOL Parse(FILE *file);
 
-    void Var(char *name, PROF_VAR_TYPE type, sint32 *numValue,
+    void Var(const char *name, PROF_VAR_TYPE type, sint32 *numValue,
              char *stringValue, bool visible = true);
     void Save();
 
@@ -523,11 +523,7 @@ public:
     void SetRequireCD(BOOL require)                     { m_requireCD = require; }
     void SetProtected(BOOL pro)                         { m_protected = pro; }
     void SetTryWindowsResolution(BOOL tryIt)            { m_tryWindowsResolution = tryIt; }
-#ifdef __AUI_USE_SDL__
     void SetUseDirectXBlitter(BOOL tryIt)               { m_useDirectXBlitter = FALSE; (void)tryIt; } // disabled on SDL
-#else
-    void SetUseDirectXBlitter(BOOL tryIt)               { m_useDirectXBlitter = tryIt; }
-#endif
     void SetScreenResWidth(sint32 width)                { m_screenResWidth = width; }
     void SetScreenResHeight(sint32 height)              { m_screenResHeight = height; }
 
@@ -718,11 +714,7 @@ public:
 #endif
 
     BOOL        IsTryWindowsResolution() const  { return m_tryWindowsResolution; }
-#ifdef __AUI_USE_SDL__
     BOOL        IsUseDirectXBlitter() const     { return FALSE; }
-#else
-    BOOL        IsUseDirectXBlitter() const     { return m_useDirectXBlitter; }
-#endif
     sint32      GetScreenResWidth() const       { return m_screenResWidth; }
     sint32      GetScreenResHeight() const      { return m_screenResHeight; }
 
@@ -762,7 +754,7 @@ public:
     BOOL        IsAlienEndGameOn() const        { return m_alienEndGame; }
     BOOL        AllowAISettleMoveCheat() const  { return m_allow_ai_settle_move_cheat; }
     BOOL        IsDiplomacyLogOn() const        { return m_is_diplomacy_log_on; }
-    void        SetDiplmacyLog(BOOL b);
+    void        SetDiplmacyLog(bool b);
     BOOL        IsAllUnitCompleteMessages() const { return m_unitCompleteMessages; }
     BOOL        IsNonContinuousUnitCompleteMessages() const { return m_nonContinuousUnitCompleteMessages; }
 

@@ -210,7 +210,11 @@ CivPaths::CivPaths(AUI_ERRCODE &errcode)
 
 	MBCHAR	tempPath[_MAX_PATH];
 	MBCHAR	fullPath[_MAX_PATH];
+
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 	MBCHAR	*s;
+	#pragma GCC diagnostic pop
 
 	snprintf(tempPath, sizeof(tempPath), "%s%s%s", m_hdPath, FILE_SEP, m_savePath);
 	s = _fullpath(fullPath, tempPath, _MAX_PATH);
@@ -504,7 +508,7 @@ MBCHAR *CivPaths::FindFile(C3DIR dir, const MBCHAR *filename, MBCHAR *path,
 	)
 	{
 		MBCHAR const *	l_dataPath	= *p;
-		if (checkLocalizedPath && MakeAssetPath(fullPath, m_hdPath, l_dataPath, m_localizedPath, m_assetPaths[dir], filename) ||
+		if ((checkLocalizedPath && MakeAssetPath(fullPath, m_hdPath, l_dataPath, m_localizedPath, m_assetPaths[dir], filename)) ||
 		                          MakeAssetPath(fullPath, m_hdPath, l_dataPath, m_defaultPath,   m_assetPaths[dir], filename)
 		   )
 		{

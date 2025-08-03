@@ -306,7 +306,7 @@ public:
 
 namespace std {
 template<>
-struct greater<Goal_ptr> : binary_function<Goal_ptr, Goal_ptr, bool>
+struct greater<Goal_ptr>// : binary_function<Goal_ptr, Goal_ptr, bool>
 {
 	bool operator()(const Goal_ptr _X, const Goal_ptr _Y) const
 	{

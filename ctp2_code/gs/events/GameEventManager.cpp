@@ -511,7 +511,7 @@ GAME_EVENT_ERR GameEventManager::ActivateHook
 	return m_hooks[type]->Activate(args, 0, resumeIndex);
 }
 
-char *GameEventManager::ArgCharToName(char want)
+const char *GameEventManager::ArgCharToName(char want)
 {
 	switch(want) {
 		case GEAC_ARMY: return "GEA_Army";
@@ -532,7 +532,7 @@ char *GameEventManager::ArgCharToName(char want)
 	}
 }
 
-char *GameEventManager::ArgToName(GAME_EVENT_ARGUMENT want)
+const char *GameEventManager::ArgToName(GAME_EVENT_ARGUMENT want)
 {
 	switch(want) {
 		case GEA_Army: return "GEA_Army";
@@ -677,7 +677,7 @@ bool GameEventManager::VerifyArgs(GAME_EVENT type, const GAME_EVENT_ARGUMENT* ar
 		return false;
 
 	GameEventDescription *desc = &g_eventDescriptions[type];
-	char *argString = desc->args;
+	const char *argString = desc->args;
 
 	bool done = false;
 	GAME_EVENT_ARGUMENT nextArg;
@@ -730,8 +730,11 @@ bool GameEventManager::VerifyArgs(GAME_EVENT type, const GAME_EVENT_ARGUMENT* ar
 		static TerrainImprovement imp;
 		static TradeRoute route;
 
+		#pragma GCC diagnostic push
+		#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 		sint32 value;
 		Path *path;
+		#pragma GCC diagnostic pop
 
 #ifdef _DEBUG
 #define DG_PRINT(fmt, val) { EVENTLOG((fmt, val)); }

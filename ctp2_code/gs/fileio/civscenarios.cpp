@@ -21,7 +21,7 @@
 //
 // Modifications from the original Activision code:
 //
-// - Fixed memory leak in LoadScenarioPackData, by Martin Gühmann.
+// - Fixed memory leak in LoadScenarioPackData, by Martin Gï¿½hmann.
 //
 //----------------------------------------------------------------------------
 
@@ -155,7 +155,7 @@ void CivScenarios::LoadScenarioPackData(ScenarioPack *pack, MBCHAR *packPath)
 	}
 
 	sint32		numScenarios;
-	fscanf(listFile, "%ld", &numScenarios);
+	fscanf(listFile, "%d", &numScenarios);
 
 	fclose(listFile);
 
@@ -199,7 +199,7 @@ void CivScenarios::LoadScenarioPackData(ScenarioPack *pack, MBCHAR *packPath)
 			walker.Next();
 			i++;
 		}
-//Added by Martin Gühmann
+//Added by Martin Gï¿½hmann
 	}
 
 	//This must be deleted always

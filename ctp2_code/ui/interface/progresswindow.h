@@ -43,7 +43,7 @@ public:
 
 	static void BeginProgress(
 		ProgressWindow *&progwin,
-		MBCHAR *ldlBlock,
+		const MBCHAR *ldlBlock,
 		sint32 maxval,
 		sint32 x = -1, sint32 y = -1);
 

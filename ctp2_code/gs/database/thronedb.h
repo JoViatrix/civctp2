@@ -53,7 +53,7 @@ protected:
 
 	sint32 ParseThroneDatabase(MBCHAR *filename);
 
-	sint32 CheckToken(Token *token, sint32 type, MBCHAR *error);
+	sint32 CheckToken(Token *token, sint32 type, const MBCHAR *error);
 
 	sint32 ParseAThrone(Token *throneToken, ThroneInfo *throneInfo);
 };

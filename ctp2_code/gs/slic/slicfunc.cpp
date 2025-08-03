@@ -2242,8 +2242,8 @@ SFN_ERROR Slic_DoOutOfFuel::Call(SlicArgList *args) //Disabled?
 
 SFN_ERROR Slic_DoPillageOwnLand::Call(SlicArgList *args)
 {
-    if (args->Count() > 0)
-        return SFN_ERROR_NUM_ARGS;
+	if (args->Count() > 0)
+		return SFN_ERROR_NUM_ARGS;
 
 	Unit unit = g_slicEngine->GetContext()->GetUnit(0);
 
@@ -2281,8 +2281,8 @@ SFN_ERROR Slic_DoCertainRevolution::Call(SlicArgList *args) //Disabled?
 
 SFN_ERROR Slic_DoFreeSlaves::Call(SlicArgList *args)
 {
-    if (args->Count() > 0)
-        return SFN_ERROR_NUM_ARGS;
+	if (args->Count() > 0)
+		return SFN_ERROR_NUM_ARGS;
 
 	Unit city = g_slicEngine->GetContext()->GetCity(0);
 

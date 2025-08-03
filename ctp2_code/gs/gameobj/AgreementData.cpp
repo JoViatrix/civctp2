@@ -25,8 +25,8 @@
 //
 // Modifications from the original Activision code:
 //
-// - Initialized local variables. (Sep 9th 2005 Martin Gühmann)
-// - Replaced old const database by new one. (5-Aug-2007 Martin Gühmann)
+// - Initialized local variables. (Sep 9th 2005 Martin Gï¿½hmann)
+// - Replaced old const database by new one. (5-Aug-2007 Martin Gï¿½hmann)
 //
 //----------------------------------------------------------------------------
 
@@ -430,37 +430,38 @@ void AgreementData::SetTarget(const Unit &city)
 
 void AgreementData::Dump(const sint32 i)
 	{
-	MBCHAR	s[_MAX_PATH] ;
+	MBCHAR	s[_MAX_PATH + sizeof(" \"Unknown diplomatic agreement type\"") - 1];
+	MBCHAR s_temp[_MAX_PATH];
 
-	sprintf(s, "%d (%d) - P%d & P%d agree to ", i, m_expires, m_owner, m_recipient) ;
+	snprintf(s_temp, sizeof(s_temp), "%d (%d) - P%d & P%d agree to ", i, m_expires, m_owner, m_recipient) ;
 	switch (m_agreement)
 		{
 		case AGREEMENT_TYPE_DEMAND_STOP_TRADE :
-			sprintf(s, "%s stop trade with P%d", s, m_thirdParty) ;
+			snprintf(s, sizeof(s), "%s stop trade with P%d", s_temp, m_thirdParty) ;
 			break ;
 
 		case AGREEMENT_TYPE_DEMAND_LEAVE_OUR_LANDS :
-			sprintf(s, "%s leave the lands", s) ;
+			snprintf(s, sizeof(s), "%s leave the lands", s_temp) ;
 			break ;
 
 		case AGREEMENT_TYPE_REDUCE_POLLUTION :
-			sprintf(s, "%s reduce pollution", s) ;
+			snprintf(s, sizeof(s), "%s reduce pollution", s_temp) ;
 			break ;
 
 		case AGREEMENT_TYPE_CEASE_FIRE :
-			sprintf(s, "%s cease fire", s) ;
+			snprintf(s, sizeof(s), "%s cease fire", s_temp) ;
 			break ;
 
 		case AGREEMENT_TYPE_PACT_CAPTURE_CITY :
-			sprintf(s, "%s capture city %d", s, m_targetCity.m_id) ;
+			snprintf(s, sizeof(s), "%s capture city %d", s_temp, m_targetCity.m_id) ;
 			break ;
 
 		case AGREEMENT_TYPE_PACT_END_POLLUTION :
-			sprintf(s, "%s end pollution", s) ;
+			snprintf(s, sizeof(s), "%s end pollution", s_temp) ;
 			break ;
 
 		default :
-			sprintf(s, "%s \"Unknown diplomatic agreement type\"", s) ;
+			snprintf(s, sizeof(s), "%s \"Unknown diplomatic agreement type\"", s_temp) ;
 			break ;
 
 		}
@@ -572,7 +573,7 @@ void AgreementData::ExtractPlayer(sint32 indexId, sint32 memberId, MBCHAR *sExpa
 			break ;
 
 		case 4 :
-			sprintf(sExpanded, "%ld", g_player[civ->GetOwner()]->GetGold()) ;
+			sprintf(sExpanded, "%d", g_player[civ->GetOwner()]->GetGold()) ;
 			break ;
 
 		default :
@@ -790,9 +791,9 @@ void AgreementData::Interpret(MBCHAR *msg, MBCHAR *sInterpreted)
 #define MAX_MEMBERS	15
 	struct
 		{
-		MBCHAR	*sClass ;
+		const MBCHAR	*sClass ;
 
-		MBCHAR	*sMember[MAX_MEMBERS] ;
+		const MBCHAR	*sMember[MAX_MEMBERS] ;
 		} varList[]={	{ "city",		{ "name", "population", "happiness", "production", "food", "pos", "leader_name", "civ_name_singular", "civ_name_plural", "country_name", "slaves", NULL } },
 						{ "gold",		{ "amount", NULL } },
 						{ "player",		{ "leader_name", "civ_name_singular", "civ_name_plural", "country_name", "gold", NULL } },

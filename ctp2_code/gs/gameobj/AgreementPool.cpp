@@ -124,7 +124,7 @@ void AgreementPool::EndRound(void)
 
 	AgreementDynamicArray	expired ;
 
-	for(i = 0; i < k_OBJ_POOL_TABLE_SIZE; i++)
+	for(size_t i = 0; i < k_OBJ_POOL_TABLE_SIZE; i++)
 		{
 		if(m_table[i])
 			{

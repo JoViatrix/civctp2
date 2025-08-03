@@ -136,7 +136,7 @@ operation_failed:
 	return TRUE;
 }
 
-sint32 ThroneDB::CheckToken(Token *token, sint32 type, MBCHAR *error)
+sint32 ThroneDB::CheckToken(Token *token, sint32 type, const MBCHAR *error)
 {
 
 	if(token->Next() != type) {
