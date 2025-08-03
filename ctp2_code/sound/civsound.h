@@ -65,6 +65,7 @@ public:
 	MIX_Track    *GetTrack() const;
 	MBCHAR       *GetSoundFilename();
 	const BOOL   IsPlaying() const;
+	const bool	 Play(SDL_PropertiesID properties);
 	void         SetIsPlaying(const BOOL &is);
 	const sint32 GetSoundID() const;
 	void         SetIsLooping(const BOOL &looping);

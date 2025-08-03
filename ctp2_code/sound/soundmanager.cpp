@@ -349,11 +349,10 @@ SoundManager::AddSound(const SOUNDTYPE &type,
 
 		else {
 		if (MIX_SetTrackAudio(sound->GetTrack(), sound->GetAudio()))
-				MIX_PlayTrack(sound->GetTrack(), g_noLoopProps);
+				sound->Play(g_noLoopProps);
 		else
 			SDL_Log("MIX_SetTrackAudio(sound->GetTrack(), sound->GetAudio()) in SoundManager::AddSound failed: %s", SDL_GetError());
 		}
-		sound->SetIsPlaying(true);
 	}
 }
 

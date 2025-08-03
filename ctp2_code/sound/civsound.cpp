@@ -48,7 +48,8 @@ extern ProjectFile  *g_SoundPF;
 
 CivSound::CivSound(const uint32 &associatedObject, const sint32 &soundID)
   : m_Audio(nullptr), m_soundTrack(nullptr),
-    m_associatedObject(associatedObject)
+    m_associatedObject(associatedObject),
+	m_volume(MIX_MAX_VOLUME)
 
 {
     const char *fname;
@@ -73,13 +74,7 @@ CivSound::CivSound(const uint32 &associatedObject, const sint32 &soundID)
     size_t      l_dataSize = 0;
     m_dataptr   = g_SoundPF->getData(m_soundFilename, l_dataSize);
     m_datasize  = static_cast<sint32>(l_dataSize);
-
-# if 0
-    // Argh, audio format mismatch!!!
-	m_Audio = Mix_QuickLoad_RAW((Uint8 *) m_dataptr, (Uint32) m_datasize);
-# else
     m_Audio = MIX_LoadAudio_IO(NULL, SDL_IOFromMem(m_dataptr, static_cast<int>(m_datasize)), 0, 1);
-# endif
 }
 
 CivSound::~CivSound()
@@ -166,15 +161,42 @@ CivSound::SetVolume(const sint32 &volume)
 {
     if (0 == m_Audio) return;
 
+	sint32 vol = volume;
+
+	if (vol < 0)
+	{
+		SDL_Log("The volume asked to set %d < 0. Set to 0.", volume);
+		vol = 0;
+	}
+	if (vol > 10)
+	{
+		SDL_Log("The volume asked to set %d > 10. Set to 10.", volume);
+		vol = 10;
+	}
+
+	m_volume = vol;
+}
+
+const bool
+CivSound::Play(SDL_PropertiesID properties)
+{
 	// Scale volume from 0-SLIDER_FULL to 0-MIX_MAX_VOLUME
-	float scaledVolume = (float)((double)volume * (double)MIX_MAX_VOLUME / 10); //SLIDER_FULL=10
+	float scaledVolume = (float)((double)m_volume * (double)MIX_MAX_VOLUME / 10.0f); //SLIDER_FULL=10
 
 	if (scaledVolume > MIX_MAX_VOLUME)
 		scaledVolume = (float)MIX_MAX_VOLUME;
 
-	if (MIX_SetTrackGain(m_soundTrack, scaledVolume))
-		m_volume = volume;
-	else
+	if (!MIX_SetTrackGain(m_soundTrack, scaledVolume))
+	{
 		SDL_Log("MIX_SetTrackGain(m_soundTrack, scaledVolume) failed: %s", SDL_GetError());
-}
+		return false;
+	}
 
+	if (!MIX_PlayTrack(m_soundTrack, properties))
+	{
+		SDL_Log("MIX_PlayTrack(m_soundTrack, properties) failed: %s", SDL_GetError());
+		return false;
+	}
+	m_isPlaying = true;
+	return true;
+}
