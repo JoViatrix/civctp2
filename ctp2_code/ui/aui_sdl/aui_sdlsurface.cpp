@@ -116,15 +116,12 @@ SDL_Surface* aui_SDLSurface::CreateSDLSurface(const int width, const int height,
 
 uint32 aui_SDLSurface::SetChromaKey( uint32 color )
 {
-	bool hr = SDL_SetSurfaceColorKey(m_lpdds, true, /*SDL_MapRGB(m_lpdds->format, color>>16, (color>>8)&0xff, color&0xff)*/color); //|SDL_RLEACCEL ?
-	//hr == 0 if succeded!
-	//fprintf(stderr, "%s L%d: SDL_SRCCOLORKEY set to %#X\n", __FILE__, __LINE__, color);
+	if (SDL_SetSurfaceColorKey(m_lpdds, true, color))
+		return aui_Surface::SetChromaKey(color); //sets aui_Surface.m_chromaKey and returns last value!
 
-	if (!hr)
-		return aui_Surface::SetChromaKey( color ); //sets aui_Surface.m_chromaKey and returns last value!
+	SDL_Log("SDL_SetSurfaceColorKey failed: %s", SDL_GetError());
 
 	//return AUI_ERRCODE_OK;  //this is not sensible, should retrun last color key!?!
-	//fprintf(stderr, "%s L%d: SDL_SRCCOLORKEY setting failed!\n", __FILE__, __LINE__);
 	return (uint32)-1; //better?
 }
 
