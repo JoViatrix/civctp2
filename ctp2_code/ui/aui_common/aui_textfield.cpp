@@ -13,12 +13,10 @@
 
 #include "ldl_data.hpp"
 
-#if defined(__AUI_USE_SDL__)
 #include "aui_sdlsurface.h"
 #include <string>
 #include <codecvt>
 #include <locale>
-#endif
 
 WNDPROC aui_TextField::m_windowProc = NULL;
 extern aui_Win* g_winFocus;
@@ -291,28 +289,17 @@ aui_TextField::~aui_TextField()
 
 size_t aui_TextField::GetFieldText( MBCHAR *text, size_t maxCount )
 {
-#ifdef __AUI_USE_DIRECTX__
-	return GetWindowText(m_hwnd, text, std::min(m_maxFieldLen, maxCount));
-#else
 	size_t n = std::min(m_maxFieldLen, maxCount);
 
 	strncpy(text, m_Text, n-1);
 	text[n-1] = '\0';
 	return strlen(text);
-#endif
 }
 
 BOOL aui_TextField::SetFieldText(const MBCHAR *text, size_t caretPos)
 {
 	m_draw |= m_drawMask & k_AUI_REGION_DRAWFLAG_UPDATE;
 
-#ifdef __AUI_USE_DIRECTX__
-	BOOL success = SetWindowText( m_hwnd, text );
-
-	if ( GetKeyboardFocus() == this ) SetFocus( m_hwnd );
-
-	return success;
-#else
 	strncpy(m_Text, text, m_maxFieldLen);
 	m_Text[m_maxFieldLen-1] = '\0'; // strncpy does not append '\0' if text is longer than m_maxFieldLen
 
@@ -331,7 +318,6 @@ BOOL aui_TextField::SetFieldText(const MBCHAR *text, size_t caretPos)
 	UpdateView();
 
 	return TRUE;
-#endif
 }
 
 #ifdef __AUI_USE_DIRECTX__
@@ -414,21 +400,9 @@ AUI_ERRCODE aui_TextField::ReleaseKeyboardFocus( void )
 	return aui_Win::ReleaseKeyboardFocus();
 }
 
-#ifdef __AUI_USE_DIRECTX__
-void aui_TextField::HitEnter( HWND hwnd )
-#else
-void aui_TextField::HitEnter() // Is this ; intended?
-#endif // __AUI_USE_DIRECTX__
+void aui_TextField::HitEnter()
 {
-#ifdef __AUI_USE_DIRECTX__
-	aui_TextField *textfield = (aui_TextField *)GetWinFromHWND( hwnd );
-	Assert( textfield != NULL );
-	if ( !textfield ) return;
-
-	if ( textfield->IsMultiLine() ) return;
-#else
 	aui_TextField *textfield = this;
-#endif
 
 	if ( textfield->GetActionFunc() )
 		textfield->GetActionFunc()(
@@ -443,26 +417,6 @@ void aui_TextField::HitEnter() // Is this ; intended?
 			0 );
 }
 
-#if defined(__AUI_USE_DIRECTX__)
-BOOL aui_TextField::IsFileName( HWND hwnd )
-{
-	aui_TextField *textfield = (aui_TextField *)GetWinFromHWND( hwnd );
-	Assert( textfield != NULL );
-	if ( !textfield ) return FALSE;
-
-	return textfield->IsFileName();
-}
-
-sint32 aui_TextField::GetMaxFieldLen( HWND hwnd )
-{
-	aui_TextField *textfield = (aui_TextField *)GetWinFromHWND( hwnd );
-	Assert( textfield != NULL );
-	if ( !textfield ) return FALSE;
-
-	return textfield->GetMaxFieldLen();
-}
-#endif // __AUI_USE_DIRECTX__
-
 AUI_ERRCODE aui_TextField::DrawThis( aui_Surface *surface, sint32 x, sint32 y )
 {
 	if ( IsHidden() ) return AUI_ERRCODE_OK;
@@ -470,9 +424,6 @@ AUI_ERRCODE aui_TextField::DrawThis( aui_Surface *surface, sint32 x, sint32 y )
 	if ( !surface ) surface = m_window->TheSurface();
 
 	RECT rect = { 0, 0, m_width, m_height };
-#ifdef __AUI_USE_DIRECTX__
-	RECT srcRect = rect;
-#endif
 	OffsetRect( &rect, m_x + x, m_y + y );
 	ToWindow( &rect );
 

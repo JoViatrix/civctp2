@@ -141,6 +141,8 @@ AUI_ERRCODE aui_SDLUI::CreateNativeScreen( BOOL useExclusiveMode )
 		c3errors_FatalDialog("aui_SDLUI", "SDL window creation failed:\n%s\n", SDL_GetError());
 	}
 
+	SDL_StartTextInput(m_SDLWindow);
+
 	if (g_theProfileDB->IsWindowedMode())
 		SDL_SetWindowMinimumSize(m_SDLWindow, 800, 600); // These numbers should be constants.
 
@@ -189,6 +191,7 @@ aui_SDLUI::~aui_SDLUI( void )
 		m_SDLRenderer = NULL;
 	}
 	if (m_SDLWindow) {
+		SDL_StopTextInput(m_SDLWindow);
 		SDL_DestroyWindow(m_SDLWindow);
 		m_SDLWindow = NULL;
 	}

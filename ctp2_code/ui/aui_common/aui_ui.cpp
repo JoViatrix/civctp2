@@ -1342,6 +1342,10 @@ AUI_ERRCODE aui_UI::HandleKeyboardEvents( void )
 
 	m_keyboard->GetInput();
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> a022322b (fixing keyboard issues + some code cleaning)
 	return AUI_ERRCODE_OK;
 
 #if 0   // Unreachable

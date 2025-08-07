@@ -24,8 +24,8 @@
 //
 // Modifications from the original Activision code:
 //
-// - Memory leaks repaired in LoadText by Martin Gühmann.
-// - Added variable and requirement retriever methods. (Sep 13th 2005 Martin Gühmann)
+// - Memory leaks repaired in LoadText by Martin Gï¿½hmann.
+// - Added variable and requirement retriever methods. (Sep 13th 2005 Martin Gï¿½hmann)
 //
 //----------------------------------------------------------------------------
 
@@ -40,9 +40,6 @@
 
 class aui_SwitchGroup;
 class aui_Static;
-#ifdef __AUI_USE_DIRECTX__
-class DirectVideo;
-#endif
 class Chart;
 class ctp2_Static;
 class ctp2_HyperTextBox;
@@ -70,9 +67,6 @@ public:
 	};
 	void SetTechHistoricalText( ctp2_HyperTextBox *text ) { m_techHistoricalText = text; };
 	void SetTechGameplayText( ctp2_HyperTextBox *text ) { m_techGameplayText = text; };
-#ifdef __AUI_USE_DIRECTX__
-	void SetTechMovie( DirectVideo *movie ) { m_techMovie = movie; };
-#endif
 	void SetTechRequirementsText( ctp2_HyperTextBox *text )
 	{
 		m_techRequirementsText = text;
@@ -100,7 +94,6 @@ public:
 	sint32 LoadRequirementsText ( SlicObject &so );
 	sint32 LoadVariablesText ( SlicObject &so );
 
-	void PlayTechMovie ( void );
 	sint32 LoadTechMovie ( void );
 	sint32 LoadTechStill( void );
 
@@ -125,9 +118,6 @@ private:
 	ctp2_HyperTextBox		*m_techGameplayText;
 	ctp2_HyperTextBox		*m_techRequirementsText;
 	ctp2_HyperTextBox		*m_techVariablesText;
-#ifdef __AUI_USE_DIRECTX__
-	DirectVideo				*m_techMovie;
-#endif
 };
 
 BOOL getNonBlankLine (char *buf, int buf_size, FILE *fp);

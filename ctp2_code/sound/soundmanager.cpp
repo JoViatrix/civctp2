@@ -347,6 +347,8 @@ SoundManager::AddSound(const SOUNDTYPE &type,
 		if (sound->GetTrack() == nullptr)
 			SDL_Log("sound->setTrack(MIX_CreateTrack(m_mixer)) in SoundManager::AddSound failed: %s", SDL_GetError());
 
+		else if (sound->GetAudio() == nullptr)
+			SDL_Log("sound->GetAudio() == nullptr: no sound set.");
 		else {
 		if (MIX_SetTrackAudio(sound->GetTrack(), sound->GetAudio()))
 				sound->Play(g_noLoopProps);

@@ -1645,11 +1645,7 @@ int WINAPI CivMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 		g_letUIProcess = FALSE;
 	}
 
-#if defined(__AUI_USE_SDL__)
 	return 0;
-#else
-	return msg.wParam;
-#endif
 }
 
 void DoFinalCleanup(int exitCode)
@@ -1660,10 +1656,6 @@ void DoFinalCleanup(int exitCode)
 	}
 
 	static bool s_cleaningUpTheApp = false;
-
-#if defined(__AUI_USE_DIRECTX__)
-	ShowWindow(gHwnd, SW_HIDE);
-#endif
 
 	if (!s_cleaningUpTheApp)
 	{
@@ -1801,6 +1793,7 @@ int SDLMessageHandler(void* userdata, SDL_Event* event)
 	// case SDL_WINDOWEVENT_
 
 	case SDL_EVENT_WINDOW_RESIZED:
+		SDL_Log("SDL_EVENT_WINDOW_RESIZED: window resized.");
 		break;
 	case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
 	{
@@ -1810,7 +1803,6 @@ int SDLMessageHandler(void* userdata, SDL_Event* event)
 	case SDL_EVENT_WINDOW_MAXIMIZED:
 	case SDL_EVENT_WINDOW_RESTORED:
 	case SDL_EVENT_WINDOW_MOVED:
-	default:
 		break;
 
 	// case SDL_WINDOWEVENT_
@@ -1844,6 +1836,9 @@ int SDLMessageHandler(void* userdata, SDL_Event* event)
 
 		return 0;
 	// SDL_MOUSEBUTTONDOWN event is handled in aui_sdlmouse.cpp
+	default:
+		break;
+
 	}
 
 	//lynx: in the code without SDL the event (if not processed up to here) is passed to the OS handler with DefWindowProc()
@@ -1995,15 +1990,9 @@ void DisplayFrame(aui_Surface *surf)
 
 BOOL ExitGame(void)
 {
-#if defined(__AUI_USE_SDL__)
 	static SDL_Event quit = { 0 };
 	quit.type = SDL_EVENT_QUIT;
 	quit.quit.type = SDL_EVENT_QUIT;
 	int e = SDL_PushEvent(&quit);
 	return (e != 0);
-#elif defined(__AUI_USE_DIRECTX__)
-	return PostMessage(gHwnd, WM_CLOSE, 0, 0);
-#else
-	return TRUE;
-#endif
 }

@@ -2080,6 +2080,7 @@ AUI_ERRCODE aui_SDLMovie::Close()
 AUI_ERRCODE aui_SDLMovie::Play()
 {
 #if defined(USE_SDL_FFMPEG)
+	SDL_Log("playing movie...");
 	if (m_videoState) {
 		m_videoState->read_tid = SDL_CreateThread(read_thread, "read_thread", m_videoState);
 		if (!m_videoState->read_tid) {

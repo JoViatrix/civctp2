@@ -24,10 +24,10 @@
 //
 // Modifications from the original Activision code:
 //
-// - Memory leaks repaired in LoadText by Martin Gühmann.
-// - Added variable and requirement retriever methods. (Sep 13th 2005 Martin Gühmann)
-// - Replaced old concept database by new one. (31-Mar-2007 Martin Gühmann)
-// - Fixed terrain database item mismatch. (21-Apr-2007 Martin Gühmann)
+// - Memory leaks repaired in LoadText by Martin Gï¿½hmann.
+// - Added variable and requirement retriever methods. (Sep 13th 2005 Martin Gï¿½hmann)
+// - Replaced old concept database by new one. (31-Mar-2007 Martin Gï¿½hmann)
+// - Fixed terrain database item mismatch. (21-Apr-2007 Martin Gï¿½hmann)
 //
 //----------------------------------------------------------------------------
 
@@ -122,10 +122,6 @@ GreatLibraryWindow::GreatLibraryWindow(AUI_ERRCODE * err)
 	m_techGameplayText      (NULL),
 	m_techRequirementsText  (NULL),
 	m_techVariablesText     (NULL)
-#ifdef __AUI_USE_DIRECTX__
-	                              ,
-	m_techMovie             (NULL)
-#endif // __AUI_USE_DIRECTX__
 {
 	m_window = (ctp2_Window *) aui_Ldl::BuildHierarchyFromRoot(s_libraryWindowBlock);
 	Assert(m_window);
@@ -142,18 +138,6 @@ GreatLibraryWindow::~GreatLibraryWindow()
 
 AUI_ERRCODE GreatLibraryWindow::Idle ( void )
 {
-#ifdef __AUI_USE_DIRECTX__
-	if (m_techMovie && m_techMovie->Open())
-    {
-		HRESULT hr = m_techMovie->PlayOne();
-		Assert(!FAILED(hr));
-		if (FAILED(hr)) {
-			m_techMovie->CloseStream();
-			delete m_techMovie;
-			m_techMovie = NULL;
-		}
-	}
-#endif
 	return AUI_ERRCODE_OK;
 }
 
@@ -232,26 +216,7 @@ sint32 GreatLibraryWindow::LoadVariablesText ( SlicObject &so )
 
 sint32 GreatLibraryWindow::LoadTechMovie ( void )
 {
-#ifdef __AUI_USE_DIRECTX__
-	if (!m_techMovie) return 0;
-	if (!strcmp(m_movie_file,"null")) return 0;
-
-	MBCHAR fullPath[_MAX_PATH];
-	if (g_civPaths->FindFile(C3DIR_VIDEOS, m_movie_file, fullPath, TRUE)) {
-
-		g_soundManager->ReleaseSoundDriver();
-
-		m_techMovie->OpenStream(fullPath);
-
-		g_soundManager->ReacquireSoundDriver();
-	} else {
-		return 0;
-	}
-
-	return 1;
-#else
 	return 0;
-#endif // __AUI_USE_DIRECTX__
 }
 
 sint32 GreatLibraryWindow::LoadTechStill( void )
@@ -269,16 +234,6 @@ sint32 GreatLibraryWindow::LoadTechStill( void )
 	}
 
 	return 1;
-}
-
-void GreatLibraryWindow::PlayTechMovie ( void )
-{
-#ifdef __AUI_USE_DIRECTX__
-	if (m_techMovie)
-    {
-        m_techMovie->PlayAll();
-    }
-#endif // __AUI_USE_DIRECTX__
 }
 
 sint32 GreatLibraryWindow::SetTechMode ( sint32 theMode, DATABASE theDatabase )
